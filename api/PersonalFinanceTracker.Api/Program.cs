@@ -7,7 +7,7 @@ using Microsoft.Extensions.DependencyInjection;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
+/* Add services to the container */
 
 builder.Services.AddDbContext<FinanceContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection") 
@@ -20,7 +20,19 @@ builder.Services.AddControllers();
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddOpenApi();
 
+var MyAllowSpecificOrigins = "_myAllowSpecificOrigins";
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy(name: MyAllowSpecificOrigins,
+        policy  => {
+            policy.WithOrigins("http://localhost:3000")
+                  .AllowAnyHeader()
+                  .AllowAnyMethod();
+        });
+});
 
+
+/* App Build */
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -33,8 +45,15 @@ if (app.Environment.IsDevelopment())
     });
 }
 
+// Add this line to enable attribute routing
+app.MapControllers();
+
 app.UseHttpsRedirection();
 
+app.UseCors(MyAllowSpecificOrigins);
+
+
+/* Test Weather Forcast Mapping */
 var summaries = new[]
 {
     "Freezing", "Bracing", "Chilly", "Cool", "Mild", "Warm", "Balmy", "Hot", "Sweltering", "Scorching"
@@ -54,8 +73,6 @@ app.MapGet("/weatherforecast", () =>
 })
 .WithName("GetWeatherForecast");
 
-// Add this line to enable attribute routing
-app.MapControllers();
 
 app.Run();
 
