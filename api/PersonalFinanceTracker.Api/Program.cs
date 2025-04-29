@@ -3,16 +3,22 @@ using Npgsql.EntityFrameworkCore.PostgreSQL;
 
 using PersonalFinanceTracker.Api.Data;
 using PersonalFinanceTracker.Api.Models;
+using Microsoft.Extensions.DependencyInjection;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
+
+builder.Services.AddDbContext<FinanceContext>(options =>
+    options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection") 
+        ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found."),
+        npgsqlOptions => npgsqlOptions.EnableRetryOnFailure()
+    ));
+
+builder.Services.AddControllers();
+
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddOpenApi();
-
-var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
-builder.Services.AddDbContext<FinanceContext>(options =>
-    options.UseNpgsql(connectionString));
 
 
 var app = builder.Build();
@@ -47,6 +53,9 @@ app.MapGet("/weatherforecast", () =>
     return forecast;
 })
 .WithName("GetWeatherForecast");
+
+// Add this line to enable attribute routing
+app.MapControllers();
 
 app.Run();
 
