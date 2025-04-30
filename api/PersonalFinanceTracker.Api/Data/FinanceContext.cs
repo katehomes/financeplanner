@@ -19,6 +19,7 @@ namespace PersonalFinanceTracker.Api.Data
         }
 
         public DbSet<Transaction> Transactions { get; set; }
-        // ... DbSets for other models like Accounts, Categories, etc.
+
+        public DbSet<Category> Categories { get; set; }
     }
 }
