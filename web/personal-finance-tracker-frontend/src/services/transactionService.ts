@@ -26,3 +26,8 @@ export const updateTransaction = async (
   const response = await api.put<Transaction>(`/api/transaction/${id}`, transaction);
   return response.data;
 };
+
+export const deleteTransaction = async (id: number) => {
+  await api.delete(`/api/transaction/${id}`);
+};
+

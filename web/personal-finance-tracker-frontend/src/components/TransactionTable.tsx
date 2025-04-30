@@ -1,6 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import { Transaction, NewTransaction } from '../types/transaction';
-import { fetchTransactions, addTransaction, updateTransaction } from '../services/transactionService';
+import { fetchTransactions, 
+  addTransaction, 
+  updateTransaction, 
+  deleteTransaction } from '../services/transactionService';
 
 const TransactionTable: React.FC = () => {
   const [transactions, setTransactions] = useState<Transaction[]>([]);
@@ -16,6 +19,9 @@ const TransactionTable: React.FC = () => {
   const [editTransaction, setEditTransaction] = useState<Transaction | null>(null);
   const [rawEditAmount, setRawEditAmount] = useState<string | null>(null);
   const [rawNewAmount, setRawNewAmount] = useState<string | null>(null);
+  const [selectedIds, setSelectedIds] = useState<Set<number>>(new Set());
+  const [confirmDeleteOpen, setConfirmDeleteOpen] = useState(false);
+
 
 
   useEffect(() => {
@@ -32,6 +38,19 @@ const TransactionTable: React.FC = () => {
 
     loadTransactions();
   }, []);
+
+  useEffect(() => {
+    if (confirmDeleteOpen) {
+      const proceed = window.confirm(
+        `Are you sure you want to delete ${selectedIds.size} transaction(s)? This action cannot be undone.`
+      );
+      if (proceed) {
+        handleConfirmDelete();
+      }
+      setConfirmDeleteOpen(false);
+    }
+  }, [confirmDeleteOpen]);
+  
 
   const handleAddClick = () => {
     setIsAdding(true);
@@ -122,6 +141,20 @@ const TransactionTable: React.FC = () => {
     return parseFloat(numeric) || 0;
   };
 
+  const handleConfirmDelete = async () => {
+    try {
+      await Promise.all(
+        Array.from(selectedIds).map(id => deleteTransaction(id))
+      );
+      setTransactions(prev => prev.filter(tx => !selectedIds.has(tx.id!)));
+      setSelectedIds(new Set());
+    } catch (err) {
+      alert("Failed to delete one or more transactions.");
+      console.error(err);
+    }
+  };
+  
+
   if (loading) return <p>Loading...</p>;
   if (error) return <p style={{ color: 'red' }}>{error}</p>;
 
@@ -134,6 +167,19 @@ const TransactionTable: React.FC = () => {
             <th>Date</th>
             <th>Description</th>
             <th>Actions</th>
+            <th>
+              <input
+                type="checkbox"
+                checked={selectedIds.size === transactions.length && transactions.length > 0}
+                onChange={(e) => {
+                  if (e.target.checked) {
+                    setSelectedIds(new Set(transactions.map(tx => tx.id!)));
+                  } else {
+                    setSelectedIds(new Set());
+                  }
+                }}
+              />
+            </th>
           </tr>
         </thead>
         <tbody>
@@ -188,6 +234,21 @@ const TransactionTable: React.FC = () => {
                 <td>
                   <button onClick={() => handleEdit(tx)}>Edit</button>
                 </td>
+                <td>
+                  <input
+                    type="checkbox"
+                    checked={selectedIds.has(tx.id!)}
+                    onChange={() => {
+                      setSelectedIds(prev => {
+                        const next = new Set(prev);
+                        if (next.has(tx.id!)) next.delete(tx.id!);
+                        else next.add(tx.id!);
+                        return next;
+                      });
+                    }}
+                  />
+                </td>
+
               </tr>
             )
           )}
@@ -244,6 +305,16 @@ const TransactionTable: React.FC = () => {
           + Add Transaction
         </button>
       )}
+
+      {selectedIds.size > 0 && (
+        <button
+          onClick={() => setConfirmDeleteOpen(true)}
+          style={{ marginTop: '1rem', background: 'red', color: 'white' }}
+        >
+          Delete Selected ({selectedIds.size})
+        </button>
+      )}
+
     </div>
   );
 };
