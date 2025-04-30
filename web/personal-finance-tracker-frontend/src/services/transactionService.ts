@@ -12,7 +12,17 @@ export async function fetchTransactions(): Promise<Transaction[]> {
   return response.json();
 }
 
-export const addTransaction = async (transaction: Transaction): Promise<Transaction> => {
+export const addTransaction = async (
+  transaction: Transaction
+): Promise<Transaction> => {
   const response = await api.post<Transaction>('/api/transaction', transaction);
+  return response.data;
+};
+
+export const updateTransaction = async (
+  id: number, 
+  transaction: Transaction
+): Promise<Transaction> => {
+  const response = await api.put<Transaction>(`/api/transaction/${id}`, transaction);
   return response.data;
 };

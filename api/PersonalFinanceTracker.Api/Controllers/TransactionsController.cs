@@ -26,7 +26,7 @@ namespace PersonalFinanceTracker.Api.Controllers
         public async Task<ActionResult<IEnumerable<Transaction>>> GetTransaction()
         {
             Console.WriteLine("GET /api/transactions was hit");
-            return await _context.Transactions.ToListAsync();
+            return await _context.Transactions.OrderBy(t => t.Id).ToListAsync();
         }
 
         // GET: api/Transaction/5
@@ -71,7 +71,8 @@ namespace PersonalFinanceTracker.Api.Controllers
                 }
             }
 
-            return NoContent();
+            return Ok(transaction);
+
         }
 
         // POST: api/Transaction
