@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from 'react';
-import { Category } from '../types/category';
+import { Category } from '../../types/category';
 import { fetchCategorys, 
   addCategory, 
   updateCategory, 
-  deleteCategory } from '../services/categoryService';
+  deleteCategory } from '../../services/categoryService';
 
 const CategoryTable: React.FC = () => {
   const [categories, setCategories] = useState<Category[]>([]);

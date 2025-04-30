@@ -4,6 +4,7 @@ import { fetchTransactions,
   addTransaction, 
   updateTransaction, 
   deleteTransaction } from '../services/transactionService';
+import CategorySelector from './Category/CategorySelector';
 
 const TransactionTable: React.FC = () => {
   const [transactions, setTransactions] = useState<Transaction[]>([]);
@@ -166,6 +167,7 @@ const TransactionTable: React.FC = () => {
             <th>Amount</th>
             <th>Date</th>
             <th>Description</th>
+            <th>Category</th>
             <th>Actions</th>
             <th>
               <input
@@ -217,6 +219,17 @@ const TransactionTable: React.FC = () => {
                   />
                 </td>
                 <td>
+                  <CategorySelector
+                    value={editTransaction?.categoryId ?? null}
+                    onChange={(id) =>
+                      setEditTransaction(prev => {
+                        if (!prev) return prev;
+                        return { ...prev, categoryId: id };
+                      })
+                    }
+                  />
+                </td>
+                <td>
                   <button
                     onClick={handleSaveEdit}
                     disabled={!isValidTransaction(editTransaction!)}
@@ -231,6 +244,7 @@ const TransactionTable: React.FC = () => {
                 <td>${tx.amount.toFixed(2)}</td>
                 <td>{new Date(tx.date).toLocaleDateString()}</td>
                 <td>{tx.description || '-'}</td>
+                <td>{tx.category?.name || '-'}</td>
                 <td>
                   <button onClick={() => handleEdit(tx)}>Edit</button>
                 </td>
@@ -284,6 +298,12 @@ const TransactionTable: React.FC = () => {
                   name="description"
                   value={newTransaction.description}
                   onChange={handleNewInputChange}
+                />
+              </td>
+              <td>
+                <CategorySelector
+                  value={newTransaction.categoryId ?? null}
+                  onChange={(id) => setNewTransaction(prev => ({ ...prev, categoryId: id }))}
                 />
               </td>
               <td>

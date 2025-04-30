@@ -1,6 +1,6 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import CategoryTable from '../components/CategoryTable';
+import CategoryTable from '../components/Category/CategoryTable';
 
 const Categories = () => {
 	const navigate = useNavigate();

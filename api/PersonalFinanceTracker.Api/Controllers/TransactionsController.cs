@@ -21,12 +21,14 @@ namespace PersonalFinanceTracker.Api.Controllers
             _context = context;
         }
 
-        // GET: api/Transaction
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Transaction>>> GetTransaction()
         {
             Console.WriteLine("GET /api/transactions was hit");
-            return await _context.Transactions.OrderBy(t => t.Id).ToListAsync();
+            return await _context.Transactions
+                .Include(t => t.Category)
+                .OrderBy(t => t.Id)
+                .ToListAsync();
         }
 
         // GET: api/Transaction/5

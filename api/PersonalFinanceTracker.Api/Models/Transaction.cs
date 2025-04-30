@@ -11,5 +11,9 @@ namespace PersonalFinanceTracker.Api.Models
         public DateTimeOffset Date { get; set; }
 
         public String? Description { get; set; }
+
+        public int? CategoryId { get; set; }
+        public Category? Category { get; set; }
+        
     }
 }
