@@ -27,11 +27,11 @@ const NavBar = () => {
 							>About</NavLink>
 						</li>
 						<li>
-							<NavLink to="/todo"
+							<NavLink to="/finance"
 								className={({ isActive }) => {
 									return isActive ? "active-link" : "";
 								}}
-							>Todo</NavLink>
+							>Finance</NavLink>
 						</li>
 					</ul>
 				</div>

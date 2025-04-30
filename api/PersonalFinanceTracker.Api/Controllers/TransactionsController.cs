@@ -21,7 +21,7 @@ namespace PersonalFinanceTracker.Api.Controllers
             _context = context;
         }
 
-        // GET: api/Transactions
+        // GET: api/Transaction
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Transaction>>> GetTransaction()
         {
@@ -29,7 +29,7 @@ namespace PersonalFinanceTracker.Api.Controllers
             return await _context.Transactions.ToListAsync();
         }
 
-        // GET: api/Transactions/5
+        // GET: api/Transaction/5
         [HttpGet("{id}")]
         public async Task<ActionResult<Transaction>> GetTransaction(int id)
         {
@@ -43,7 +43,7 @@ namespace PersonalFinanceTracker.Api.Controllers
             return transaction;
         }
 
-        // PUT: api/Transactions/5
+        // PUT: api/Transaction/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
         public async Task<IActionResult> PutTransaction(int id, Transaction transaction)
@@ -74,18 +74,20 @@ namespace PersonalFinanceTracker.Api.Controllers
             return NoContent();
         }
 
-        // POST: api/Transactions
+        // POST: api/Transaction
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
         public async Task<ActionResult<Transaction>> PostTransaction(Transaction transaction)
         {
+            transaction.Date = transaction.Date.ToUniversalTime();
+            
             _context.Transactions.Add(transaction);
             await _context.SaveChangesAsync();
 
             return CreatedAtAction(nameof(GetTransaction), new { id = transaction.Id }, transaction);
         }
 
-        // DELETE: api/Transactions/5
+        // DELETE: api/Transaction/5
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteTransaction(int id)
         {

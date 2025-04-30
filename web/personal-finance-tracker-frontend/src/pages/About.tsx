@@ -1,6 +1,5 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import TransactionList from '../services/api.js';
 
 const About = () => {
 	const navigate = useNavigate();
@@ -26,7 +25,6 @@ const About = () => {
 					asperiores pariatur, amet velit?
 				</p>
 			</div>
-            <TransactionList />
 		</div>
 	);
 };
