@@ -7,8 +7,9 @@ namespace PersonalFinanceTracker.Api.Models
     public class Category
     {
         public int Id { get; set; }
-        public decimal Name { get; set; }
-        public DateTimeOffset Order { get; set; }
+        
+        public required string Name { get; set; }
+        public int Order { get; set; }
 
         public String? Description { get; set; }
     }

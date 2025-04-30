@@ -1,11 +1,12 @@
 import './App.css';
 import './css/navbar.css';
 import { Routes, Route } from 'react-router-dom';
-import About from './pages/About.tsx';
-import Home from './pages/Home.tsx';
-import Finance from './pages/Finance.tsx';
-import NavBar from './components/NavBar.tsx';
-import NoMatch from './components/NoMatch.js';
+import About from './pages/About';
+import Home from './pages/Home';
+import Finance from './pages/Finance';
+import NavBar from './components/NavBar';
+import NoMatch from './components/NoMatch';
+import Categories from './pages/Categories';
 
 function App() {
   return (
@@ -16,6 +17,7 @@ function App() {
               <Route path="/" element={<Home />} />
               <Route path="/about" element={<About />} />
               <Route path="/finance" element={<Finance />} />
+              <Route path="/category" element={<Categories />} />
               <Route path="*" element={<NoMatch />} />
           </Routes>
       </div>
