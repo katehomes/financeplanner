@@ -1,9 +1,10 @@
 import React, { useEffect, useState } from 'react';
+import Select from 'react-select';
 import { Category } from '../../types/category';
 import { fetchCategorys } from '../../services/categoryService';
 
 type Props = {
-  value: number | null; // category ID
+  value: number | null;
   onChange: (id: number | null) => void;
   disabled?: boolean;
 };
@@ -11,15 +12,12 @@ type Props = {
 const CategorySelector: React.FC<Props> = ({ value, onChange, disabled = false }) => {
   const [categories, setCategories] = useState<Category[]>([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     const load = async () => {
       try {
         const data = await fetchCategorys();
         setCategories(data);
-      } catch (err) {
-        setError('Failed to load categories');
       } finally {
         setLoading(false);
       }
@@ -27,22 +25,22 @@ const CategorySelector: React.FC<Props> = ({ value, onChange, disabled = false }
     load();
   }, []);
 
-  if (loading) return <select disabled><option>Loading...</option></select>;
-  if (error) return <select disabled><option>{error}</option></select>;
+  const options = categories.map(cat => ({
+    value: cat.id,
+    label: cat.name,
+  }));
+
+  const selectedOption = options.find(opt => opt.value === value) ?? null;
 
   return (
-    <select
-      value={value ?? ''}
-      onChange={(e) => onChange(e.target.value ? Number(e.target.value) : null)}
-      disabled={disabled}
-    >
-      <option value="">None</option>
-      {categories.map((cat) => (
-        <option key={cat.id} value={cat.id}>
-          {cat.name}
-        </option>
-      ))}
-    </select>
+<Select
+    isClearable
+    isDisabled={disabled || loading}
+    options={options}
+    value={selectedOption}
+    onChange={(selected) => onChange(selected?.value ?? null)}
+    placeholder={loading ? 'Loading...' : 'Select a category'}
+  />
   );
 };
 

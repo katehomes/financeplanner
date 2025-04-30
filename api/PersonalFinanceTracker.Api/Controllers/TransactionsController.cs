@@ -21,10 +21,10 @@ namespace PersonalFinanceTracker.Api.Controllers
             _context = context;
         }
 
+        // GET: api/Transaction/
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Transaction>>> GetTransaction()
         {
-            Console.WriteLine("GET /api/transactions was hit");
             return await _context.Transactions
                 .Include(t => t.Category)
                 .OrderBy(t => t.Id)
@@ -72,6 +72,10 @@ namespace PersonalFinanceTracker.Api.Controllers
                     throw;
                 }
             }
+
+            var updatedTransaction = await _context.Transactions
+                .Include(t => t.Category)
+                .FirstOrDefaultAsync(t => t.Id == id);
 
             return Ok(transaction);
 

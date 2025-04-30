@@ -8,6 +8,8 @@ import CategorySelector from './Category/CategorySelector';
 
 const TransactionTable: React.FC = () => {
   const [transactions, setTransactions] = useState<Transaction[]>([]);
+  const [sortBy, setSortBy] = useState<keyof Transaction | null>(null);
+  const [sortAsc, setSortAsc] = useState(true);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [isAdding, setIsAdding] = useState(false);
@@ -52,7 +54,34 @@ const TransactionTable: React.FC = () => {
     }
   }, [confirmDeleteOpen]);
   
+  const handleSort = (field: keyof Transaction) => {
+    if (sortBy === field) {
+      setSortAsc(!sortAsc); // toggle direction
+    } else {
+      setSortBy(field);
+      setSortAsc(true); // default to ascending on first click
+    }
+  };
 
+  const sortedTransactions = [...transactions].sort((a, b) => {
+    if (!sortBy) return 0;
+  
+    const valA = a[sortBy];
+    const valB = b[sortBy];
+  
+    if (valA == null) return 1;
+    if (valB == null) return -1;
+  
+    if (typeof valA === 'number' && typeof valB === 'number') {
+      return sortAsc ? valA - valB : valB - valA;
+    }
+  
+    return sortAsc
+      ? String(valA).localeCompare(String(valB))
+      : String(valB).localeCompare(String(valA));
+  });
+  
+  
   const handleAddClick = () => {
     setIsAdding(true);
     setNewTransaction({
@@ -164,18 +193,18 @@ const TransactionTable: React.FC = () => {
       <table border={1} cellPadding={8} style={{ width: '100%', borderCollapse: 'collapse' }}>
         <thead>
           <tr>
-            <th>Amount</th>
-            <th>Date</th>
-            <th>Description</th>
-            <th>Category</th>
-            <th>Actions</th>
+          <th onClick={() => handleSort('date')}>Date {sortBy === 'date' && (sortAsc ? '↑' : '↓')}</th>
+          <th onClick={() => handleSort('amount')}>Amount {sortBy === 'amount' && (sortAsc ? '↑' : '↓')}</th>
+          <th onClick={() => handleSort('description')}>Description {sortBy === 'description' && (sortAsc ? '↑' : '↓')}</th>
+          <th onClick={() => handleSort('categoryId')}>Category {sortBy === 'categoryId' && (sortAsc ? '↑' : '↓')}</th>
+          <th>Actions</th>
             <th>
               <input
                 type="checkbox"
                 checked={selectedIds.size === transactions.length && transactions.length > 0}
                 onChange={(e) => {
                   if (e.target.checked) {
-                    setSelectedIds(new Set(transactions.map(tx => tx.id!)));
+                    setSelectedIds(new Set(sortedTransactions.map(tx => tx.id!)));
                   } else {
                     setSelectedIds(new Set());
                   }
@@ -185,9 +214,17 @@ const TransactionTable: React.FC = () => {
           </tr>
         </thead>
         <tbody>
-          {transactions.map(tx =>
+          {sortedTransactions.map(tx =>
             currentlyEditingId === tx.id ? (
               <tr key={tx.id}>
+                <td>
+                  <input
+                    type="date"
+                    name="date"
+                    value={formatDateForInput(editTransaction!.date)}
+                    onChange={handleEditInputChange}
+                  />
+                </td>
                 <td>
                   <input
                     type="text"
@@ -200,14 +237,6 @@ const TransactionTable: React.FC = () => {
                       setEditTransaction(prev => prev ? { ...prev, amount: parsed } : prev);
                     }}
                     onBlur={() => setRawEditAmount(null)}
-                  />
-                </td>
-                <td>
-                  <input
-                    type="date"
-                    name="date"
-                    value={formatDateForInput(editTransaction!.date)}
-                    onChange={handleEditInputChange}
                   />
                 </td>
                 <td>
@@ -241,8 +270,8 @@ const TransactionTable: React.FC = () => {
               </tr>
             ) : (
               <tr key={tx.id}>
-                <td>${tx.amount.toFixed(2)}</td>
                 <td>{new Date(tx.date).toLocaleDateString()}</td>
+                <td>${tx.amount.toFixed(2)}</td>
                 <td>{tx.description || '-'}</td>
                 <td>{tx.category?.name || '-'}</td>
                 <td>
