@@ -1,5 +1,6 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
+import CategoryTable from '../components/CategoryTable';
 
 const Categories = () => {
 	const navigate = useNavigate();
@@ -12,7 +13,7 @@ const Categories = () => {
 				<h1>Categories</h1>
 			</div>
 			<div className="categories-container">
-				
+				<CategoryTable />
 			</div>
 		</div>
 	);

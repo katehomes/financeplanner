@@ -10,6 +10,9 @@ const Finance = () => {
             <button className="btn" onClick={() => navigate(-1)}>
                 Go Back
             </button>
+            <button className="btn" onClick={() => navigate("../category")}>
+                Categories
+            </button>
             <div className="title">
                 <h1>Finance</h1>
             </div>

@@ -1,48 +1,46 @@
 import React, { useEffect, useState } from 'react';
-import { Transaction, NewTransaction } from '../types/transaction';
-import { fetchTransactions, 
-  addTransaction, 
-  updateTransaction, 
-  deleteTransaction } from '../services/transactionService';
+import { Category } from '../types/category';
+import { fetchCategorys, 
+  addCategory, 
+  updateCategory, 
+  deleteCategory } from '../services/categoryService';
 
 const CategoryTable: React.FC = () => {
-  const [transactions, setTransactions] = useState<Transaction[]>([]);
+  const [categories, setCategories] = useState<Category[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [isAdding, setIsAdding] = useState(false);
-  const [newTransaction, setNewTransaction] = useState<Transaction>({
-    amount: 0,
-    date: new Date().toISOString().split('T')[0],
-    description: '',
+  const [newCategory, setNewCategory] = useState<Category>({
+    name: "",
+    order: 0,
+    description: ''
   });
   const [currentlyEditingId, setCurrentlyEditingId] = useState<number | null>(null);
-  const [editTransaction, setEditTransaction] = useState<Transaction | null>(null);
-  const [rawEditAmount, setRawEditAmount] = useState<string | null>(null);
-  const [rawNewAmount, setRawNewAmount] = useState<string | null>(null);
+  const [editCategory, setEditCategory] = useState<Category | null>(null);
   const [selectedIds, setSelectedIds] = useState<Set<number>>(new Set());
   const [confirmDeleteOpen, setConfirmDeleteOpen] = useState(false);
 
 
 
   useEffect(() => {
-    const loadTransactions = async () => {
+    const loadCategories = async () => {
       try {
-        const data = await fetchTransactions();
-        setTransactions(data);
+        const data = await fetchCategorys();
+        setCategories(data);
       } catch (err) {
-        setError((err as Error).message || 'Failed to load transactions');
+        setError((err as Error).message || 'Failed to load categories');
       } finally {
         setLoading(false);
       }
     };
 
-    loadTransactions();
+    loadCategories();
   }, []);
 
   useEffect(() => {
     if (confirmDeleteOpen) {
       const proceed = window.confirm(
-        `Are you sure you want to delete ${selectedIds.size} transaction(s)? This action cannot be undone.`
+        `Are you sure you want to delete ${selectedIds.size} category(s)? This action cannot be undone.`
       );
       if (proceed) {
         handleConfirmDelete();
@@ -54,10 +52,10 @@ const CategoryTable: React.FC = () => {
 
   const handleAddClick = () => {
     setIsAdding(true);
-    setNewTransaction({
-      amount: 0,
-      date: new Date().toISOString().split('T')[0],
-      description: '',
+    setNewCategory({
+      name: "",
+      order: 0,
+      description: ''
     });
   };
 
@@ -65,91 +63,75 @@ const CategoryTable: React.FC = () => {
     setIsAdding(false);
   };
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleNewInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
-    setNewTransaction(prev => ({
+    setNewCategory(prev => ({
       ...prev,
-      [name]: name === 'amount' ? parseCurrency(value) || 0 : value,
+      [name]: name === 'order' ? Number(value) : value
     }));
-  };
+  };  
 
-  const isValidTransaction = (tx: Transaction): boolean => {
-    return tx.amount > 0 && tx.date.trim() !== '';
+  const isValidCategory = (cg: Category): boolean => {
+    return cg.name.trim() !== '';
   };
 
   const handleSaveNew = async () => {
-    if (!isValidTransaction(newTransaction)) return;
+    if (!isValidCategory(newCategory)) return;
 
     try {
-      const saved = await addTransaction(newTransaction);
-      setTransactions([...transactions, saved]);
+      const saved = await addCategory(newCategory);
+      setCategories([...categories, saved]);
       setIsAdding(false);
     } catch (err) {
-      alert('Failed to save transaction.');
+      alert('Failed to save category.');
       console.error(err);
     }
   };
 
-  const handleEdit = (tx: Transaction) => {
-    setCurrentlyEditingId(tx.id!);
-    setEditTransaction({ ...tx });
+  const handleEdit = (cg: Category) => {
+    setCurrentlyEditingId(cg.id!);
+    setEditCategory({ ...cg });
   };
 
   const handleCancelEdit = () => {
     setCurrentlyEditingId(null);
-    setEditTransaction(null);
+    setEditCategory(null);
   };
 
   const handleSaveEdit = async () => {
-    if (!editTransaction || !isValidTransaction(editTransaction)) return;
+    if (!editCategory || !isValidCategory(editCategory)) return;
 
-    const updated = await updateTransaction(editTransaction.id!, editTransaction);
-    setTransactions(prev =>
+    const updated = await updateCategory(editCategory.id!, editCategory);
+    setCategories(prev =>
       prev.map(t => (t.id === updated.id ? updated : t))
     );
 
     setCurrentlyEditingId(null);
-    setEditTransaction(null);
+    setEditCategory(null);
   };
 
   const handleEditInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
   
-    setEditTransaction(prev => {
+    setEditCategory(prev => {
       if (!prev) return prev;
   
       return {
         ...prev,
-        [name]: name === 'amount' ? parseCurrency(value) || 0 : value,
+        [name]: name === 'order' ? Number(value) : value
       };
     });
-  };
-
-  const formatDateForInput = (dateStr: string) => {
-    return new Date(dateStr).toISOString().split('T')[0];
-  };
-
-  const formatCurrency = (value: number) =>
-    value.toLocaleString('en-US', {
-      style: 'currency',
-      currency: 'USD',
-      minimumFractionDigits: 2,
-    });
-  
-  const parseCurrency = (value: string): number => {
-    const numeric = value.replace(/[^0-9.-]+/g, ''); // Remove $ and commas
-    return parseFloat(numeric) || 0;
   };
 
   const handleConfirmDelete = async () => {
     try {
       await Promise.all(
-        Array.from(selectedIds).map(id => deleteTransaction(id))
+        Array.from(selectedIds).map(id => deleteCategory(id))
       );
-      setTransactions(prev => prev.filter(tx => !selectedIds.has(tx.id!)));
+      setCategories(prev => prev.filter(cg => !selectedIds.has(cg.id!)));
       setSelectedIds(new Set());
     } catch (err) {
-      alert("Failed to delete one or more transactions.");
+      alert("Failed to delete one or more categories.");
       console.error(err);
     }
   };
@@ -163,17 +145,17 @@ const CategoryTable: React.FC = () => {
       <table border={1} cellPadding={8} style={{ width: '100%', borderCollapse: 'collapse' }}>
         <thead>
           <tr>
-            <th>Amount</th>
-            <th>Date</th>
+            <th>Name</th>
+            <th>Order</th>
             <th>Description</th>
             <th>Actions</th>
             <th>
               <input
                 type="checkbox"
-                checked={selectedIds.size === transactions.length && transactions.length > 0}
+                checked={selectedIds.size === categories.length && categories.length > 0}
                 onChange={(e) => {
                   if (e.target.checked) {
-                    setSelectedIds(new Set(transactions.map(tx => tx.id!)));
+                    setSelectedIds(new Set(categories.map(cg => cg.id!)));
                   } else {
                     setSelectedIds(new Set());
                   }
@@ -183,28 +165,22 @@ const CategoryTable: React.FC = () => {
           </tr>
         </thead>
         <tbody>
-          {transactions.map(tx =>
-            currentlyEditingId === tx.id ? (
-              <tr key={tx.id}>
+          {categories.map(cg =>
+            currentlyEditingId === cg.id ? (
+              <tr key={cg.id}>
                 <td>
                   <input
                     type="text"
-                    name="amount"
-                    value={rawEditAmount ?? formatCurrency(editTransaction!.amount)}
-                    onFocus={() => setRawEditAmount(editTransaction!.amount.toString())}
-                    onChange={e => {
-                      setRawEditAmount(e.target.value);
-                      const parsed = parseCurrency(e.target.value);
-                      setEditTransaction(prev => prev ? { ...prev, amount: parsed } : prev);
-                    }}
-                    onBlur={() => setRawEditAmount(null)}
+                    name="name"
+                    value={editCategory!.name ?? ''}
+                    onChange={handleEditInputChange}
                   />
                 </td>
                 <td>
                   <input
-                    type="date"
-                    name="date"
-                    value={formatDateForInput(editTransaction!.date)}
+                    type="number"
+                    name="order"
+                    value={editCategory!.order ?? 0}
                     onChange={handleEditInputChange}
                   />
                 </td>
@@ -212,14 +188,14 @@ const CategoryTable: React.FC = () => {
                   <input
                     type="text"
                     name="description"
-                    value={editTransaction!.description || ''}
+                    value={editCategory!.description ?? ''}
                     onChange={handleEditInputChange}
                   />
                 </td>
                 <td>
                   <button
                     onClick={handleSaveEdit}
-                    disabled={!isValidTransaction(editTransaction!)}
+                    disabled={!isValidCategory(editCategory!)}
                   >
                     Save
                   </button>
@@ -227,22 +203,22 @@ const CategoryTable: React.FC = () => {
                 </td>
               </tr>
             ) : (
-              <tr key={tx.id}>
-                <td>${tx.amount.toFixed(2)}</td>
-                <td>{new Date(tx.date).toLocaleDateString()}</td>
-                <td>{tx.description || '-'}</td>
+              <tr key={cg.id}>
+                <td>{cg.name}</td>
+                <td>{cg.order || '-'}</td>
+                <td>{cg.description || '-'}</td>
                 <td>
-                  <button onClick={() => handleEdit(tx)}>Edit</button>
+                  <button onClick={() => handleEdit(cg)}>Edit</button>
                 </td>
                 <td>
                   <input
                     type="checkbox"
-                    checked={selectedIds.has(tx.id!)}
+                    checked={selectedIds.has(cg.id!)}
                     onChange={() => {
                       setSelectedIds(prev => {
                         const next = new Set(prev);
-                        if (next.has(tx.id!)) next.delete(tx.id!);
-                        else next.add(tx.id!);
+                        if (next.has(cg.id!)) next.delete(cg.id!);
+                        else next.add(cg.id!);
                         return next;
                       });
                     }}
@@ -255,41 +231,36 @@ const CategoryTable: React.FC = () => {
 
           {isAdding && (
             <tr>
-              <td>
-                <input
-                 type="text"
-                 name="amount"
-                 value={rawNewAmount ?? formatCurrency(newTransaction.amount)}
-                 onFocus={() => setRawNewAmount(newTransaction.amount.toString())}
-                 onChange={e => {
-                   setRawNewAmount(e.target.value);
-                   const parsed = parseCurrency(e.target.value);
-                   setNewTransaction(prev => ({ ...prev, amount: parsed }));
-                 }}
-                 onBlur={() => setRawNewAmount(null)}
-                />
-              </td>
-              <td>
-                <input
-                  type="date"
-                  name="date"
-                  value={newTransaction.date}
-                  onChange={handleInputChange}
-                  required
-                />
-              </td>
-              <td>
-                <input
-                  type="text"
-                  name="description"
-                  value={newTransaction.description}
-                  onChange={handleInputChange}
-                />
-              </td>
+            <td>
+              <input
+                type="text"
+                name="name"
+                value={newCategory.name || ''}
+                onChange={handleNewInputChange}
+                placeholder="Category..."
+              />
+            </td>
+            <td>
+              <input
+                type="number"
+                name="order"
+                value={newCategory.order || 0}
+                onChange={handleNewInputChange}
+              />
+            </td>
+            <td>
+              <input
+                type="text"
+                name="description"
+                value={newCategory.description || ''}
+                onChange={handleNewInputChange}
+                placeholder="Description..."
+              />
+            </td>
               <td>
                 <button
                   onClick={handleSaveNew}
-                  disabled={!isValidTransaction(newTransaction)}
+                  disabled={!isValidCategory(newCategory)}
                 >
                   Save
                 </button>
@@ -302,7 +273,7 @@ const CategoryTable: React.FC = () => {
 
       {!isAdding && (
         <button style={{ marginTop: '1rem' }} onClick={handleAddClick}>
-          + Add Transaction
+          + Add Category
         </button>
       )}
 

@@ -8,7 +8,7 @@ export async function fetchCategorys(): Promise<Category[]> {
   const response = await fetch(`${API_BASE}/api/category`);
 
   console.log("response", response);
-  if (!response.ok) throw new Error('Failed to fetch categorys');
+  if (!response.ok) throw new Error('Failed to fetch categories');
   return response.json();
 }
 

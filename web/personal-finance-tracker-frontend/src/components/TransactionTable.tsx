@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Transaction, NewTransaction } from '../types/transaction';
+import { Transaction } from '../types/transaction';
 import { fetchTransactions, 
   addTransaction, 
   updateTransaction, 
@@ -65,7 +65,7 @@ const TransactionTable: React.FC = () => {
     setIsAdding(false);
   };
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleNewInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setNewTransaction(prev => ({
       ...prev,
@@ -274,7 +274,7 @@ const TransactionTable: React.FC = () => {
                   type="date"
                   name="date"
                   value={newTransaction.date}
-                  onChange={handleInputChange}
+                  onChange={handleNewInputChange}
                   required
                 />
               </td>
@@ -283,7 +283,7 @@ const TransactionTable: React.FC = () => {
                   type="text"
                   name="description"
                   value={newTransaction.description}
-                  onChange={handleInputChange}
+                  onChange={handleNewInputChange}
                 />
               </td>
               <td>
