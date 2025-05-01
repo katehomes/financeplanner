@@ -24,12 +24,14 @@ namespace PersonalFinanceTracker.Api.Data
             modelBuilder.Entity<TransactionTag>()
                 .HasOne(tt => tt.Transaction)
                 .WithMany(t => t.TransactionTags)
-                .HasForeignKey(tt => tt.TransactionId);
+                .HasForeignKey(tt => tt.TransactionId)
+                .OnDelete(DeleteBehavior.Cascade);
 
             modelBuilder.Entity<TransactionTag>()
                 .HasOne(tt => tt.Tag)
                 .WithMany(t => t.TransactionTags)
-                .HasForeignKey(tt => tt.TagId);
+                .HasForeignKey(tt => tt.TagId)
+                .OnDelete(DeleteBehavior.Restrict);
 
 
             base.OnModelCreating(modelBuilder);
@@ -39,6 +41,8 @@ namespace PersonalFinanceTracker.Api.Data
 
         public DbSet<Category> Categories { get; set; }
 
-        public DbSet<Tag> Tags { get; set; } = default!;
-            }
+        public DbSet<Tag> Tags { get; set; }
+
+public DbSet<TransactionTag> TransactionTags { get; set; }
+    }
 }
