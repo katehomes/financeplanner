@@ -7,10 +7,15 @@ type Props = {
 };
 
 const TagChip: React.FC<Props> = ({ tag, className = '' }) => {
+  const borderStyle = tag.border
+    ? `.3em solid ${tag.border}`
+    : 'none';
+
   const style: React.CSSProperties = {
     display: 'inline-block',
     backgroundColor: tag.color ?? '#e0e0e0',
-    color: '#333',
+    color: tag.text ?? '#333',
+    border: borderStyle,
     borderRadius: '999px',
     padding: '2px 10px',
     fontSize: '0.75rem',

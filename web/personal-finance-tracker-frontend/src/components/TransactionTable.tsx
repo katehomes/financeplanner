@@ -6,7 +6,6 @@ import { fetchTransactions,
   deleteTransaction } from '../services/transactionService';
 import CategorySelector from './Category/CategorySelector';
 import TagSelector from './Tag/TagSelector';
-import TagChip from './Tag/TagChip';
 import TagChipList from './Tag/TagChipList';
 
 const TransactionTable: React.FC = () => {

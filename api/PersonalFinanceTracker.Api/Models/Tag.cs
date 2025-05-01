@@ -10,7 +10,11 @@ namespace PersonalFinanceTracker.Api.Models
         public int Id { get; set; }
         public string Name { get; set; } = null!;
 
-        public string? Color { get; set; } // optional hex or tailwind class name
+        public string? Color { get; set; }
+
+        public string? Border { get; set; }
+
+        public string? Text { get; set; }
         
         [JsonIgnore]
         public ICollection<TransactionTag> TransactionTags { get; set; } = new List<TransactionTag>();
