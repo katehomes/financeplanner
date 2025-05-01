@@ -6,7 +6,7 @@ const Finance = () => {
     const navigate = useNavigate();
     
     return (
-        <div className="container">
+        <div className="page-route-container">
             <button className="btn" onClick={() => navigate(-1)}>
                 Go Back
             </button>

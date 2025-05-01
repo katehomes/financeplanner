@@ -5,6 +5,7 @@ import { fetchTags,
   updateTag, 
   deleteTag } from '../../services/tagService';
   import TagChip from "../Tag/TagChip"
+import '../../css/tagtable.css'
 
 const TagTable: React.FC = () => {
   const [tags, setTags] = useState<Tag[]>([]);
@@ -139,179 +140,203 @@ const TagTable: React.FC = () => {
 
   return (
     <div>
-      <table border={1} cellPadding={8} style={{ width: '100%', borderCollapse: 'collapse' }}>
-        <thead>
-          <tr>
-            <th rowSpan={2}>Name</th>
-            <th colSpan={3}>Color / Style</th>
-            <th rowSpan={2}>Preview</th>
-            <th rowSpan={2}>Actions</th>
-            <th rowSpan={2}>
-              <input
-                type="checkbox"
-                checked={selectedIds.size === tags.length && tags.length > 0}
-                onChange={(e) => {
-                  if (e.target.checked) {
-                    setSelectedIds(new Set(tags.map(tag => tag.id!)));
-                  } else {
-                    setSelectedIds(new Set());
-                  }
-                }}
-              />
-            </th>
-          </tr>
-          <tr>
-            <th>Background</th>
-            <th>Border</th>
-            <th>Text</th>
-          </tr>
-        </thead>
-        <tbody>
-          {tags.map(tag =>
-            currentlyEditingId === tag.id ? (
-              <tr key={tag.id}>
-                <td>
-                  <input
-                    type="text"
-                    name="name"
-                    value={editTag!.name ?? ''}
-                    onChange={handleEditInputChange}
-                  />
-                </td>
-                <td>
-                  <input
-                    type="text"
-                    name="color"
-                    value={editTag!.color || ''}
-                    onChange={handleEditInputChange}
-                    placeholder="#e0e0e0 or 'bg-blue-500'"
-                  />
-                </td>
-                <td>
-                  <input
-                    type="text"
-                    name="border"
-                    value={editTag!.border || ''}
-                    onChange={handleEditInputChange}
-                    placeholder="#e0e0e0 or 'bg-blue-500'"
-                  />
-                </td>
-                <td>
-                  <input
-                    type="text"
-                    name="text"
-                    value={editTag!.text || ''}
-                    onChange={handleEditInputChange}
-                    placeholder="#e0e0e0 or 'bg-blue-500'"
-                  />
-                </td>
-                <td><TagChip key={editTag!.id} tag={editTag!} /></td>
-                <td>
-                  <button
-                    onClick={handleSaveEdit}
-                    disabled={!isValidTag(editTag!)}
-                  >
-                    Save
-                  </button>
-                  <button onClick={handleCancelEdit}>Cancel</button>
-                </td>
-              </tr>
-            ) : (
-              <tr key={tag.id}>
-                <td>{tag.name}</td>
-                <td>{tag.color || '-'}</td>
-                <td>{tag.border || '-'}</td>
-                <td>{tag.text || '-'}</td>
-                <td><TagChip key={tag.id} tag={tag} /></td>
-                <td>
-                  <button onClick={() => handleEdit(tag)}>Edit</button>
-                </td>
-                <td>
-                  <input
-                    type="checkbox"
-                    checked={selectedIds.has(tag.id!)}
-                    onChange={() => {
-                      setSelectedIds(prev => {
-                        const next = new Set(prev);
-                        if (next.has(tag.id!)) next.delete(tag.id!);
-                        else next.add(tag.id!);
-                        return next;
-                      });
-                    }}
-                  />
-                </td>
-
-              </tr>
-            )
-          )}
-
-          {isAdding && (
+      <div className="table-container">
+      <table className="tag-table">
+          <thead className='tag-header-sticky'>
             <tr>
-            <td>
-              <input
-                type="text"
-                name="name"
-                value={newTag.name || ''}
-                onChange={handleNewInputChange}
-                placeholder="Tag..."
-              />
-            </td>
-            <td>
-              <input
-                type="text"
-                name="color"
-                value={newTag.color || ''}
-                onChange={handleNewInputChange}
-                placeholder="#e0e0e0 or 'bg-blue-500'"
-              />
-            </td>
-            <td>
-              <input
-                type="text"
-                name="border"
-                value={newTag.border || ''}
-                onChange={handleNewInputChange}
-                placeholder="#e0e0e0 or 'bg-blue-500'"
-              />
-            </td>
-            <td>
-              <input
-                type="text"
-                name="text"
-                value={newTag.text || ''}
-                onChange={handleNewInputChange}
-                placeholder="#e0e0e0 or 'bg-blue-500'"
-              />
-            </td>
-            <td>PREVIEW</td>
-            <td>
-              <button
-                onClick={handleSaveNew}
-                disabled={!isValidTag(newTag)}
-              >
-                Save
-              </button>
-              <button onClick={handleCancelNew}>Cancel</button>
-            </td>
+              <th rowSpan={2}>Name</th>
+              <th colSpan={3}>Color / Style</th>
+              <th rowSpan={2}>Preview</th>
+              <th rowSpan={2}>Actions</th>
+              <th rowSpan={2}>
+                <input
+                  type="checkbox"
+                  checked={selectedIds.size === tags.length && tags.length > 0}
+                  onChange={(e) => {
+                    if (e.target.checked) {
+                      setSelectedIds(new Set(tags.map(tag => tag.id!)));
+                    } else {
+                      setSelectedIds(new Set());
+                    }
+                  }}
+                />
+              </th>
             </tr>
+            <tr>
+              <th>Background</th>
+              <th>Border</th>
+              <th>Text</th>
+            </tr>
+          </thead>
+          <tbody>
+            {tags.map((tag, i) =>
+              currentlyEditingId === tag.id ? (
+                <tr key={tag.id} style={{ backgroundColor: i % 2 === 0 ? '#fdfdfd' : '#f0f4f8' }}>
+                  <td>
+                    <input
+                      type="text"
+                      name="name"
+                      value={editTag!.name ?? ''}
+                      onChange={handleEditInputChange}
+                    />
+                  </td>
+                  <td>
+                    <input
+                      type="text"
+                      name="color"
+                      value={editTag!.color || ''}
+                      onChange={handleEditInputChange}
+                      placeholder="#e0e0e0 or 'bg-blue-500'"
+                    />
+                  </td>
+                  <td>
+                    <input
+                      type="text"
+                      name="border"
+                      value={editTag!.border || ''}
+                      onChange={handleEditInputChange}
+                      placeholder="#e0e0e0 or 'bg-blue-500'"
+                    />
+                  </td>
+                  <td>
+                    <input
+                      type="text"
+                      name="text"
+                      value={editTag!.text || ''}
+                      onChange={handleEditInputChange}
+                      placeholder="#e0e0e0 or 'bg-blue-500'"
+                    />
+                  </td>
+                  <td><TagChip key={editTag!.id} tag={editTag!} /></td>
+                  <td>
+                    <button
+                      className='save-button'
+                      onClick={handleSaveEdit}
+                      disabled={!isValidTag(editTag!)}
+                    >
+                      Save
+                    </button>
+                    <button
+                      className='cancel-button' 
+                      onClick={handleCancelEdit}>Cancel</button>
+                  </td>
+                  <td>
+                    <input
+                      type="checkbox"
+                      checked={selectedIds.has(tag.id!)}
+                      onChange={() => {
+                        setSelectedIds(prev => {
+                          const next = new Set(prev);
+                          if (next.has(tag.id!)) next.delete(tag.id!);
+                          else next.add(tag.id!);
+                          return next;  
+                        });
+                      }}
+                    />
+                  </td>
+                </tr>
+              ) : (
+                <tr key={tag.id} style={{ backgroundColor: i % 2 === 0 ? '#fdfdfd' : '#f0f4f8' }}>
+                  <td>{tag.name}</td>
+                  <td>{tag.color || '-'}</td>
+                  <td>{tag.border || '-'}</td>
+                  <td>{tag.text || '-'}</td>
+                  <td><TagChip key={tag.id} tag={tag} /></td>
+                  <td>
+                    <button onClick={() => handleEdit(tag)}>Edit</button>
+                  </td>
+                  <td>
+                    <input
+                      type="checkbox"
+                      checked={selectedIds.has(tag.id!)}
+                      onChange={() => {
+                        setSelectedIds(prev => {
+                          const next = new Set(prev);
+                          if (next.has(tag.id!)) next.delete(tag.id!);
+                          else next.add(tag.id!);
+                          return next;
+                        });
+                      }}
+                    />
+                  </td>
+                </tr>
+              )
+            )}
+
+            {isAdding && (
+              <tr>
+              <td>
+                <input
+                  type="text"
+                  name="name"
+                  value={newTag.name || ''}
+                  onChange={handleNewInputChange}
+                  placeholder="Tag..."
+                />
+              </td>
+              <td>
+                <input
+                  type="text"
+                  name="color"
+                  value={newTag.color || ''}
+                  onChange={handleNewInputChange}
+                  placeholder="#e0e0e0 or 'bg-blue-500'"
+                />
+              </td>
+              <td>
+                <input
+                  type="text"
+                  name="border"
+                  value={newTag.border || ''}
+                  onChange={handleNewInputChange}
+                  placeholder="#e0e0e0 or 'bg-blue-500'"
+                />
+              </td>
+              <td>
+                <input
+                  type="text"
+                  name="text"
+                  value={newTag.text || ''}
+                  onChange={handleNewInputChange}
+                  placeholder="#e0e0e0 or 'bg-blue-500'"
+                />
+              </td>
+              <td><TagChip key={newTag!.id} tag={newTag!} /></td>
+              <td>
+                <button
+                  className='save-button'
+                  onClick={handleSaveNew}
+                  disabled={!isValidTag(newTag)}
+                >
+                  Save
+                </button>
+                <button 
+                  className='cancel-button'
+                  onClick={handleCancelNew}>Cancel</button>
+              </td>
+              </tr>
+            )}
+          </tbody>
+        </table>
+
+        <div className='tag-footer-sticky'>
+          {!isAdding && (
+            <button style={{ marginTop: '1rem' }} onClick={handleAddClick}>
+              + Add Tag
+            </button>
           )}
-        </tbody>
-      </table>
 
-      {!isAdding && (
-        <button style={{ marginTop: '1rem' }} onClick={handleAddClick}>
-          + Add Tag
-        </button>
-      )}
-
-      {selectedIds.size > 0 && (
-        <button
-          onClick={() => setConfirmDeleteOpen(true)}
-          style={{ marginTop: '1rem', background: 'red', color: 'white' }}
-        >
-          Delete Selected ({selectedIds.size})
-        </button>
-      )}
+          {selectedIds.size > 0 && (
+            <button
+              onClick={() => setConfirmDeleteOpen(true)}
+              style={{ marginTop: '1rem', background: 'red', color: 'white' }}
+            >
+              Delete Selected ({selectedIds.size})
+            </button>
+          )}
+        </div>
+        
+      </div>
 
     </div>
   );

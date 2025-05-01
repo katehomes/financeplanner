@@ -1,3 +1,6 @@
+html {
+	background-color: #f4f8fa;
+}
 body {
   margin: 0;
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
@@ -14,6 +17,7 @@ code {
 
 .app-body {
   margin: auto 2.5em;
+  background-color: #f4f8fa;
 }
 
 ul li a {
@@ -73,4 +77,33 @@ nav .nav-items {
 	margin: 2px;
 	white-space: nowrap;
   }
+
+input {
+	padding: 6px 10px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    width: 100%;
+    max-width: 180px;
+    box-sizing: border-box;
+}
+
+.save-button {
+	margin-right: 6px;
+    padding: 5px 10px;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.cancel-button {
+	margin-right: 6px;
+    padding: 5px 10px;
+    background-color: #6c757d;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
   

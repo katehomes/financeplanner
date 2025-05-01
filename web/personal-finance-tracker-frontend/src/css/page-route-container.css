@@ -1,0 +1,14 @@
+.sticky-header {
+    position: sticky;
+    top: 0;
+    padding: 10px 16px;
+    background: #555;
+    color: #f1f1f1;
+    width: 100%;
+    flex-flow: column wrap;
+}
+
+.tags-container {
+    overflow-y: scroll;
+    width: 100%;
+}

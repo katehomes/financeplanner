@@ -8,7 +8,7 @@ type Props = {
 
 const TagChip: React.FC<Props> = ({ tag, className = '' }) => {
   const borderStyle = tag.border
-    ? `.3em solid ${tag.border}`
+    ? `.25em solid ${tag.border}`
     : 'none';
 
   const style: React.CSSProperties = {
