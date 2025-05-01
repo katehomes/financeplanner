@@ -289,9 +289,15 @@ const TransactionTable: React.FC = () => {
                 <td>{tx.description || '-'}</td>
                 <td>{tx.category?.name || '-'}</td>
                 <td>
-                  {tx.tags && tx.tags.length > 0
-                    ? tx.tags.map(tag => tag.name).join(', ')
-                    : '-'}
+                  {tx.tags && tx.tags.length > 0 ? (
+                    <div style={{ display: 'flex', flexWrap: 'wrap' }}>
+                      {tx.tags.map(tag => (
+                        <span key={tag.id} className="tag-chip">{tag.name}</span>
+                      ))}
+                    </div>
+                  ) : (
+                    '-'
+                  )}
                 </td>
                 <td>
                   <button onClick={() => handleEdit(tx)}>Edit</button>

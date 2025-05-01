@@ -61,3 +61,16 @@ nav .nav-items {
 .nav-items ul li a.active {
 	color: #00a8ff;
 }
+
+
+.tag-chip {
+	display: inline-block;
+	background-color: #e0e0e0;
+	color: #333;
+	border-radius: 999px;
+	padding: 2px 10px;
+	font-size: 0.75rem;
+	margin: 2px;
+	white-space: nowrap;
+  }
+  
