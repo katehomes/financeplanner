@@ -18,6 +18,20 @@ namespace PersonalFinanceTracker.Api.Data
             modelBuilder.Entity<Transaction>()
                 .HasMany(t => t.Tags);
 
+            modelBuilder.Entity<TransactionTag>()
+                .HasKey(tt => new { tt.TransactionId, tt.TagId });
+
+            modelBuilder.Entity<TransactionTag>()
+                .HasOne(tt => tt.Transaction)
+                .WithMany(t => t.TransactionTags)
+                .HasForeignKey(tt => tt.TransactionId);
+
+            modelBuilder.Entity<TransactionTag>()
+                .HasOne(tt => tt.Tag)
+                .WithMany(t => t.TransactionTags)
+                .HasForeignKey(tt => tt.TagId);
+
+
             base.OnModelCreating(modelBuilder);
         }
 

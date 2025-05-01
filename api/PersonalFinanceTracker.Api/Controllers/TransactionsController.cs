@@ -64,39 +64,41 @@ namespace PersonalFinanceTracker.Api.Controllers
             if (existingTransaction == null)
                 return NotFound();
 
-            // ✅ Update basic fields
+            // Update scalar fields
             existingTransaction.Amount = transaction.Amount;
             existingTransaction.Date = transaction.Date.ToUniversalTime();
             existingTransaction.Description = transaction.Description;
             existingTransaction.CategoryId = transaction.CategoryId;
 
-            // ✅ Handle Tags: Clear and replace with resolved list
-            existingTransaction.Tags.Clear();
+            existingTransaction.TransactionTags = new List<TransactionTag>();
 
             foreach (var tag in transaction.Tags ?? new List<Tag>())
             {
-                var existingTag = await _context.Tags
-                    .FirstOrDefaultAsync(t => t.Name.ToLower() == tag.Name.ToLower());
-
-                if (existingTag != null)
+                var resolved = await ResolveTagAsync(tag);
+                existingTransaction.TransactionTags.Add(new TransactionTag
                 {
-                    existingTransaction.Tags.Add(existingTag);
-                }
-                else
-                {
-                    var newTag = new Tag { Name = tag.Name };
-                    _context.Tags.Add(newTag);
-                    existingTransaction.Tags.Add(newTag);
-                }
+                    Tag = resolved,
+                    Transaction = existingTransaction
+                });
             }
+
+            // Clear the incoming transaction.Tags (it's not tracked by EF)
+            transaction.Tags = null;
 
             await _context.SaveChangesAsync();
 
-            // ✅ Re-fetch with updated tags + category
+            // Re-fetch transaction with joined tags and category
             var updated = await _context.Transactions
                 .Include(t => t.Category)
-                .Include(t => t.Tags)
-                .FirstOrDefaultAsync(t => t.Id == id);
+                .Include(t => t.TransactionTags)
+                    .ThenInclude(tt => tt.Tag)
+                .FirstOrDefaultAsync(t => t.Id == existingTransaction.Id);
+
+            if (updated != null)
+            {
+                // Populate .Tags from .TransactionTags
+                updated.Tags = updated.TransactionTags.Select(tt => tt.Tag).ToList();
+            }
 
             return Ok(updated);
         }
@@ -107,11 +109,39 @@ namespace PersonalFinanceTracker.Api.Controllers
         public async Task<ActionResult<Transaction>> PostTransaction(Transaction transaction)
         {
             transaction.Date = transaction.Date.ToUniversalTime();
-            
+
+            transaction.TransactionTags = new List<TransactionTag>();
+
+            foreach (var tag in transaction.Tags ?? new List<Tag>())
+            {
+                var resolved = await ResolveTagAsync(tag);
+                transaction.TransactionTags.Add(new TransactionTag
+                {
+                    Tag = resolved,
+                    Transaction = transaction
+                });
+            }
+
+            // Clear the incoming transaction.Tags (it's not tracked by EF)
+            transaction.Tags = null;
+
             _context.Transactions.Add(transaction);
             await _context.SaveChangesAsync();
 
-            return CreatedAtAction(nameof(GetTransaction), new { id = transaction.Id }, transaction);
+            // Re-fetch transaction with joined tags and category
+            var created = await _context.Transactions
+                .Include(t => t.Category)
+                .Include(t => t.TransactionTags)
+                    .ThenInclude(tt => tt.Tag)
+                .FirstOrDefaultAsync(t => t.Id == transaction.Id);
+
+            if (created != null)
+            {
+                // Populate .Tags from .TransactionTags
+                created.Tags = created.TransactionTags.Select(tt => tt.Tag).ToList();
+            }
+
+            return CreatedAtAction(nameof(GetTransaction), new { id = created?.Id }, created);
         }
 
         // DELETE: api/Transaction/5
@@ -134,5 +164,38 @@ namespace PersonalFinanceTracker.Api.Controllers
         {
             return _context.Transactions.Any(e => e.Id == id);
         }
+
+        private async Task<Tag> ResolveTagAsync(Tag inputTag)
+        {
+            // 1. Try by Id
+            if (inputTag.Id != 0)
+            {
+                var byId = await _context.Tags.FindAsync(inputTag.Id);
+                if (byId != null)
+                    return byId;
+            }
+
+            // 2. Try by name (case-insensitive)
+            if (!string.IsNullOrWhiteSpace(inputTag.Name))
+            {
+                var lowerName = inputTag.Name.ToLower();
+                var byName = await _context.Tags
+                    .FirstOrDefaultAsync(t => t.Name.ToLower() == lowerName);
+
+                if (byName != null)
+                    return byName;
+            }
+
+            // 3. Create new tag
+            var newTag = new Tag
+            {
+                Name = inputTag.Name.Trim(),
+                Color = inputTag.Color
+            };
+
+            _context.Tags.Add(newTag); // Track it so EF inserts it on SaveChanges
+            return newTag;
+        }
+
     }
 }

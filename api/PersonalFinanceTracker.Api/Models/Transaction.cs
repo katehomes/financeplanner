@@ -1,5 +1,6 @@
 using System.ComponentModel.DataAnnotations.Schema;
 using Microsoft.EntityFrameworkCore;
+using System.Text.Json.Serialization;
 
 namespace PersonalFinanceTracker.Api.Models
 {
@@ -14,7 +15,11 @@ namespace PersonalFinanceTracker.Api.Models
 
         public int? CategoryId { get; set; }
         public Category? Category { get; set; }
+
+        [JsonIgnore]
+        public ICollection<TransactionTag> TransactionTags { get; set; } = new List<TransactionTag>();
         
-        public ICollection<Tag> Tags { get; set; } = new List<Tag>();
+        [NotMapped]
+        public List<Tag> Tags { get; set; } = new();
     }
 }

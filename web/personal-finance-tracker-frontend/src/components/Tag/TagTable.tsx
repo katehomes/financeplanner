@@ -4,6 +4,7 @@ import { fetchTags,
   addTag, 
   updateTag, 
   deleteTag } from '../../services/tagService';
+  import TagChip from "../Tag/TagChip"
 
 const TagTable: React.FC = () => {
   const [tags, setTags] = useState<Tag[]>([]);
@@ -67,8 +68,8 @@ const TagTable: React.FC = () => {
     }));
   };  
 
-  const isValidTag = (cg: Tag): boolean => {
-    return cg.name.trim() !== '';
+  const isValidTag = (tg: Tag): boolean => {
+    return tg.name.trim() !== '';
   };
 
   const handleSaveNew = async () => {
@@ -84,9 +85,9 @@ const TagTable: React.FC = () => {
     }
   };
 
-  const handleEdit = (cg: Tag) => {
-    setCurrentlyEditingId(cg.id!);
-    setEditTag({ ...cg });
+  const handleEdit = (tg: Tag) => {
+    setCurrentlyEditingId(tg.id!);
+    setEditTag({ ...tg });
   };
 
   const handleCancelEdit = () => {
@@ -124,7 +125,7 @@ const TagTable: React.FC = () => {
       await Promise.all(
         Array.from(selectedIds).map(id => deleteTag(id))
       );
-      setTags(prev => prev.filter(cg => !selectedIds.has(cg.id!)));
+      setTags(prev => prev.filter(tg => !selectedIds.has(tg.id!)));
       setSelectedIds(new Set());
     } catch (err) {
       alert("Failed to delete one or more tags.");
@@ -142,6 +143,8 @@ const TagTable: React.FC = () => {
         <thead>
           <tr>
             <th>Name</th>
+            <th>Color / Style</th>
+            <th>Preview</th>
             <th>Actions</th>
             <th>
               <input
@@ -149,7 +152,7 @@ const TagTable: React.FC = () => {
                 checked={selectedIds.size === tags.length && tags.length > 0}
                 onChange={(e) => {
                   if (e.target.checked) {
-                    setSelectedIds(new Set(tags.map(cg => cg.id!)));
+                    setSelectedIds(new Set(tags.map(tg => tg.id!)));
                   } else {
                     setSelectedIds(new Set());
                   }
@@ -159,9 +162,9 @@ const TagTable: React.FC = () => {
           </tr>
         </thead>
         <tbody>
-          {tags.map(cg =>
-            currentlyEditingId === cg.id ? (
-              <tr key={cg.id}>
+          {tags.map(tg =>
+            currentlyEditingId === tg.id ? (
+              <tr key={tg.id}>
                 <td>
                   <input
                     type="text"
@@ -170,6 +173,16 @@ const TagTable: React.FC = () => {
                     onChange={handleEditInputChange}
                   />
                 </td>
+                <td>
+                  <input
+                    type="text"
+                    name="color"
+                    value={editTag!.color || ''}
+                    onChange={handleEditInputChange}
+                    placeholder="#e0e0e0 or 'bg-blue-500'"
+                  />
+                </td>
+                <td>PREVIEW</td>
                 <td>
                   <button
                     onClick={handleSaveEdit}
@@ -181,20 +194,28 @@ const TagTable: React.FC = () => {
                 </td>
               </tr>
             ) : (
-              <tr key={cg.id}>
-                <td>{cg.name}</td>
+              <tr key={tg.id}>
+                <td>{tg.name}</td>
+                <td>{tg.color || '-'}</td>
                 <td>
-                  <button onClick={() => handleEdit(cg)}>Edit</button>
+                  {tg.color ? (
+                    <td>tags here</td>
+                  ) : (
+                    '-'
+                  )}
+                </td>
+                <td>
+                  <button onClick={() => handleEdit(tg)}>Edit</button>
                 </td>
                 <td>
                   <input
                     type="checkbox"
-                    checked={selectedIds.has(cg.id!)}
+                    checked={selectedIds.has(tg.id!)}
                     onChange={() => {
                       setSelectedIds(prev => {
                         const next = new Set(prev);
-                        if (next.has(cg.id!)) next.delete(cg.id!);
-                        else next.add(cg.id!);
+                        if (next.has(tg.id!)) next.delete(tg.id!);
+                        else next.add(tg.id!);
                         return next;
                       });
                     }}
@@ -216,15 +237,25 @@ const TagTable: React.FC = () => {
                 placeholder="Tag..."
               />
             </td>
-              <td>
-                <button
-                  onClick={handleSaveNew}
-                  disabled={!isValidTag(newTag)}
-                >
-                  Save
-                </button>
-                <button onClick={handleCancelNew}>Cancel</button>
-              </td>
+            <td>
+              <input
+                type="text"
+                name="color"
+                value={newTag.color || ''}
+                onChange={handleNewInputChange}
+                placeholder="#e0e0e0 or 'bg-blue-500'"
+              />
+            </td>
+            <td>PREVIEW</td>
+            <td>
+              <button
+                onClick={handleSaveNew}
+                disabled={!isValidTag(newTag)}
+              >
+                Save
+              </button>
+              <button onClick={handleCancelNew}>Cancel</button>
+            </td>
             </tr>
           )}
         </tbody>

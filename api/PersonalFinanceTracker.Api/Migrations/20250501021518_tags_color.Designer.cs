@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using PersonalFinanceTracker.Api.Data;
@@ -11,9 +12,11 @@ using PersonalFinanceTracker.Api.Data;
 namespace PersonalFinanceTracker.Api.Migrations
 {
     [DbContext(typeof(FinanceContext))]
-    partial class FinanceContextModelSnapshot : ModelSnapshot
+    [Migration("20250501021518_tags_color")]
+    partial class tags_color
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -100,21 +103,6 @@ namespace PersonalFinanceTracker.Api.Migrations
                     b.ToTable("transaction", "finance");
                 });
 
-            modelBuilder.Entity("PersonalFinanceTracker.Api.Models.TransactionTag", b =>
-                {
-                    b.Property<int>("TransactionId")
-                        .HasColumnType("integer");
-
-                    b.Property<int>("TagId")
-                        .HasColumnType("integer");
-
-                    b.HasKey("TransactionId", "TagId");
-
-                    b.HasIndex("TagId");
-
-                    b.ToTable("transaction_tags", "finance");
-                });
-
             modelBuilder.Entity("PersonalFinanceTracker.Api.Models.Tag", b =>
                 {
                     b.HasOne("PersonalFinanceTracker.Api.Models.Transaction", null)
@@ -131,35 +119,9 @@ namespace PersonalFinanceTracker.Api.Migrations
                     b.Navigation("Category");
                 });
 
-            modelBuilder.Entity("PersonalFinanceTracker.Api.Models.TransactionTag", b =>
-                {
-                    b.HasOne("PersonalFinanceTracker.Api.Models.Tag", "Tag")
-                        .WithMany("TransactionTags")
-                        .HasForeignKey("TagId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("PersonalFinanceTracker.Api.Models.Transaction", "Transaction")
-                        .WithMany("TransactionTags")
-                        .HasForeignKey("TransactionId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Tag");
-
-                    b.Navigation("Transaction");
-                });
-
-            modelBuilder.Entity("PersonalFinanceTracker.Api.Models.Tag", b =>
-                {
-                    b.Navigation("TransactionTags");
-                });
-
             modelBuilder.Entity("PersonalFinanceTracker.Api.Models.Transaction", b =>
                 {
                     b.Navigation("Tags");
-
-                    b.Navigation("TransactionTags");
                 });
 #pragma warning restore 612, 618
         }

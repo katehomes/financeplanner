@@ -6,6 +6,8 @@ import { fetchTransactions,
   deleteTransaction } from '../services/transactionService';
 import CategorySelector from './Category/CategorySelector';
 import TagSelector from './Tag/TagSelector';
+import TagChip from './Tag/TagChip';
+import TagChipList from './Tag/TagChipList';
 
 const TransactionTable: React.FC = () => {
   const [transactions, setTransactions] = useState<Transaction[]>([]);
@@ -270,7 +272,6 @@ const TransactionTable: React.FC = () => {
                       })
                     }
                   />
-
                 </td>
                 <td>
                   <button
@@ -289,15 +290,7 @@ const TransactionTable: React.FC = () => {
                 <td>{tx.description || '-'}</td>
                 <td>{tx.category?.name || '-'}</td>
                 <td>
-                  {tx.tags && tx.tags.length > 0 ? (
-                    <div style={{ display: 'flex', flexWrap: 'wrap' }}>
-                      {tx.tags.map(tag => (
-                        <span key={tag.id} className="tag-chip">{tag.name}</span>
-                      ))}
-                    </div>
-                  ) : (
-                    '-'
-                  )}
+                  <TagChipList tags={tx.tags} />
                 </td>
                 <td>
                   <button onClick={() => handleEdit(tx)}>Edit</button>
@@ -325,6 +318,15 @@ const TransactionTable: React.FC = () => {
             <tr>
               <td>
                 <input
+                  type="date"
+                  name="date"
+                  value={newTransaction.date}
+                  onChange={handleNewInputChange}
+                  required
+                />
+              </td>
+              <td>
+                <input
                  type="text"
                  name="amount"
                  value={rawNewAmount ?? formatCurrency(newTransaction.amount)}
@@ -335,15 +337,6 @@ const TransactionTable: React.FC = () => {
                    setNewTransaction(prev => ({ ...prev, amount: parsed }));
                  }}
                  onBlur={() => setRawNewAmount(null)}
-                />
-              </td>
-              <td>
-                <input
-                  type="date"
-                  name="date"
-                  value={newTransaction.date}
-                  onChange={handleNewInputChange}
-                  required
                 />
               </td>
               <td>
@@ -360,7 +353,17 @@ const TransactionTable: React.FC = () => {
                   onChange={(id) => setNewTransaction(prev => ({ ...prev, categoryId: id }))}
                 />
               </td>
-              <td>TAGS HERE</td>
+              <td>
+                <TagSelector
+                  value={newTransaction?.tags ?? []}
+                  onChange={(tags) =>
+                    setNewTransaction(prev => {
+                      if (!prev) return prev;
+                      return { ...prev, tags};
+                    })
+                  }
+                />
+              </td>
               <td>
                 <button
                   onClick={handleSaveNew}

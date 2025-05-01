@@ -25,14 +25,16 @@ namespace PersonalFinanceTracker.Api.Controllers
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Tag>>> GetTag()
         {
-            return await _context.Tags.ToListAsync();
+            return await _context.Tags
+                .OrderBy(t => t.Id)
+                .ToListAsync();
         }
 
         // GET: api/Tag/5
         [HttpGet("{id}")]
         public async Task<ActionResult<Tag>> GetTag(int id)
         {
-            var tag = await _context.Tags.FindAsync(id);
+            var tag = await _context.Tags.FirstOrDefaultAsync(t => t.Id == id);
 
             if (tag == null)
             {
@@ -70,7 +72,9 @@ namespace PersonalFinanceTracker.Api.Controllers
                 }
             }
 
-            return NoContent();
+            var updated = await _context.Tags.FirstOrDefaultAsync(t => t.Id == id);
+
+            return Ok(updated);
         }
 
         // POST: api/Tag
