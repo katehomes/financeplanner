@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace PersonalFinanceTracker.Api.Models
 {
-    [Table("Transactions")]
+    [Table("transaction")]
     public class Transaction
     {
         public int Id { get; set; }
@@ -15,5 +15,6 @@ namespace PersonalFinanceTracker.Api.Models
         public int? CategoryId { get; set; }
         public Category? Category { get; set; }
         
+        public ICollection<Tag> Tags { get; set; } = new List<Tag>();
     }
 }

@@ -1,5 +1,7 @@
 import { Category } from "../types/category";
 
+import { Tag } from "../types/tag";
+
 export type Transaction = {
     id?: number;
     amount: number;
@@ -7,8 +9,7 @@ export type Transaction = {
     description?: string;
     categoryId?: number | null
     category?: Category | null;
+    tags?: Tag[];
   };
-
-export type NewTransaction = Omit<Transaction, 'id'>;
 
   

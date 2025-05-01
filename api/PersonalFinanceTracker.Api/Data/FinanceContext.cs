@@ -15,11 +15,18 @@ namespace PersonalFinanceTracker.Api.Data
             modelBuilder.Model.SetAnnotation("Relational:HistoryTableSchema", "public");
             modelBuilder.Model.SetAnnotation("Relational:HistoryTableName", "__EFMigrationsHistory");
 
+            modelBuilder.Entity<Transaction>()
+                .HasMany(t => t.Tags)
+                .WithMany(t => t.Transactions)
+                .UsingEntity(j => j.ToTable("TransactionTags"));
+
             base.OnModelCreating(modelBuilder);
         }
 
         public DbSet<Transaction> Transactions { get; set; }
 
         public DbSet<Category> Categories { get; set; }
+
+public DbSet<PersonalFinanceTracker.Api.Models.Tag> Tag { get; set; } = default!;
     }
 }

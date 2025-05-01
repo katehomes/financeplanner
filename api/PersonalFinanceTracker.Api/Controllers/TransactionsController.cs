@@ -27,6 +27,7 @@ namespace PersonalFinanceTracker.Api.Controllers
         {
             return await _context.Transactions
                 .Include(t => t.Category)
+                .Include(t => t.Tags)
                 .OrderBy(t => t.Id)
                 .ToListAsync();
         }
@@ -35,7 +36,10 @@ namespace PersonalFinanceTracker.Api.Controllers
         [HttpGet("{id}")]
         public async Task<ActionResult<Transaction>> GetTransaction(int id)
         {
-            var transaction = await _context.Transactions.FindAsync(id);
+            var transaction = await _context.Transactions
+                .Include(t => t.Category)
+                .Include(t => t.Tags)
+                .FirstOrDefaultAsync(t => t.Id == id);
 
             if (transaction == null)
             {
@@ -75,6 +79,7 @@ namespace PersonalFinanceTracker.Api.Controllers
 
             var updatedTransaction = await _context.Transactions
                 .Include(t => t.Category)
+                .Include(t => t.Tags)
                 .FirstOrDefaultAsync(t => t.Id == id);
 
             return Ok(transaction);

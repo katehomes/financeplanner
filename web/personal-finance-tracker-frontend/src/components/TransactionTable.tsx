@@ -5,6 +5,7 @@ import { fetchTransactions,
   updateTransaction, 
   deleteTransaction } from '../services/transactionService';
 import CategorySelector from './Category/CategorySelector';
+import TagSelector from './Tag/TagSelector';
 
 const TransactionTable: React.FC = () => {
   const [transactions, setTransactions] = useState<Transaction[]>([]);
@@ -197,6 +198,7 @@ const TransactionTable: React.FC = () => {
           <th onClick={() => handleSort('amount')}>Amount {sortBy === 'amount' && (sortAsc ? '↑' : '↓')}</th>
           <th onClick={() => handleSort('description')}>Description {sortBy === 'description' && (sortAsc ? '↑' : '↓')}</th>
           <th onClick={() => handleSort('categoryId')}>Category {sortBy === 'categoryId' && (sortAsc ? '↑' : '↓')}</th>
+          <th>Tags</th>
           <th>Actions</th>
             <th>
               <input
@@ -259,6 +261,17 @@ const TransactionTable: React.FC = () => {
                   />
                 </td>
                 <td>
+                  <TagSelector
+                    value={editTransaction?.tags ?? []}
+                    onChange={(tags) =>
+                      setEditTransaction(prev =>
+                        prev ? { ...prev, tags } : prev
+                      )
+                    }
+                  />
+
+                </td>
+                <td>
                   <button
                     onClick={handleSaveEdit}
                     disabled={!isValidTransaction(editTransaction!)}
@@ -274,6 +287,11 @@ const TransactionTable: React.FC = () => {
                 <td>${tx.amount.toFixed(2)}</td>
                 <td>{tx.description || '-'}</td>
                 <td>{tx.category?.name || '-'}</td>
+                <td>
+                  {tx.tags && tx.tags.length > 0
+                    ? tx.tags.map(tag => tag.name).join(', ')
+                    : '-'}
+                </td>
                 <td>
                   <button onClick={() => handleEdit(tx)}>Edit</button>
                 </td>
@@ -335,6 +353,7 @@ const TransactionTable: React.FC = () => {
                   onChange={(id) => setNewTransaction(prev => ({ ...prev, categoryId: id }))}
                 />
               </td>
+              <td>TAGS HERE</td>
               <td>
                 <button
                   onClick={handleSaveNew}

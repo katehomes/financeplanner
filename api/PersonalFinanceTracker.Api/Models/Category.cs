@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace PersonalFinanceTracker.Api.Models
 {
-    [Table("Category")]
+    [Table("category")]
     public class Category
     {
         public int Id { get; set; }
