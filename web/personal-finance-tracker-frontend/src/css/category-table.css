@@ -7,7 +7,7 @@
     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
   }
   
-  .tag-table {
+  .category-table {
     width: 100%;
     border-collapse: separate;
     border-spacing: 0 8px;
@@ -15,22 +15,22 @@
     color: #333;
   }
 
-  .tag-table tbody tr:not(:last-child) {
+  .category-table tbody tr:not(:last-child) {
     border-bottom: 8px solid transparent;
   }
   
   
-  .tag-table thead {
+  .category-table thead {
     background-color: #f2f2f2;
     text-align: left;
   }
   
-  .tag-table th,
-  .tag-table td {
+  .category-table th,
+  .category-table td {
     padding: 12px;
   }
   
-  .tag-table th {
+  .category-table th {
     position: sticky;
     top: 0;
     background-color: #f2f2f2;
@@ -38,20 +38,20 @@
   }
   
   
-  .tag-table tr {
+  .category-table tr {
     background-color: #fafafa;
     transition: background 0.2s ease;
   }
   
-  .tag-table tr:nth-child(even) {
+  .category-table tr:nth-child(even) {
     background-color: #f0f4f8;
   }
   
-  .tag-table tr:hover {
+  .category-table tr:hover {
     background-color: #e8f0fe;
   }
   
-  .tag-table input[type="text"] {
+  .category-table input[type="text"] {
     width: 100%;
     max-width: 180px;
     padding: 6px 10px;
@@ -61,7 +61,7 @@
     background-color: #fff;
   }
   
-  .tag-table input[type="checkbox"] {
+  .category-table input[type="checkbox"] {
     transform: scale(1.2);
     cursor: pointer;
   }
@@ -115,19 +115,19 @@
   }
   
 
-  .tag-table thead ::after {
+  .category-table thead ::after {
     background-color: yellow;
     width: 100%;
   }
 
 
-    .tag-header-sticky {
+    .category-header-sticky {
         position: sticky;
         top: 0;
         z-index: 1;
     }
 
-    .tag-footer-sticky {
+    .category-footer-sticky {
         position: sticky;
         bottom: 0;
         background-color: white;

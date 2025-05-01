@@ -16,6 +16,7 @@ const Tags = () => {
 			<div className="tags-container">
 				<br />
 				<TagTable />
+				<br />
 			</div>
 		</div>
 	);

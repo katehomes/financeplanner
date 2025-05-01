@@ -4,6 +4,8 @@ import { fetchCategorys,
   addCategory, 
   updateCategory, 
   deleteCategory } from '../../services/categoryService';
+  
+import '../../css/category-table.css'
 
 const CategoryTable: React.FC = () => {
   const [categories, setCategories] = useState<Category[]>([]);
@@ -142,8 +144,9 @@ const CategoryTable: React.FC = () => {
 
   return (
     <div>
-      <table border={1} cellPadding={8} style={{ width: '100%', borderCollapse: 'collapse' }}>
-        <thead>
+      <div className="table-container">
+      <table className="tag-table">
+          <thead className='tag-header-sticky'>
           <tr>
             <th>Name</th>
             <th>Order</th>
@@ -285,6 +288,8 @@ const CategoryTable: React.FC = () => {
           Delete Selected ({selectedIds.size})
         </button>
       )}
+
+      </div>
 
     </div>
   );

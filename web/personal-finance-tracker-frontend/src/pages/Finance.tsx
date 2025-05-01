@@ -7,20 +7,22 @@ const Finance = () => {
     
     return (
         <div className="page-route-container">
-            <button className="btn" onClick={() => navigate(-1)}>
-                Go Back
-            </button>
-            <button className="btn" onClick={() => navigate("../category")}>
-                Categories
-            </button>
-            <button className="btn" onClick={() => navigate("../tag")}>
-                Tags
-            </button>
-            <div className="title">
-                <h1>Finance</h1>
-            </div>
+            <div className='sticky-header'>
+				<h1>Finance</h1>
+				<button className="btn" onClick={() => navigate(-1)}>
+                    Go Back
+                </button>
+                <button className="btn" onClick={() => navigate("../category")}>
+                    Categories
+                </button>
+                <button className="btn" onClick={() => navigate("../tag")}>
+                    Tags
+                </button>
+			</div>
             <div className="finance-container">
+                <br/>
                 <TransactionTable />
+                <br/>
             </div>
             
         </div>

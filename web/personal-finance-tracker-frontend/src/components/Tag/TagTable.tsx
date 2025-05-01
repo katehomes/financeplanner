@@ -4,7 +4,7 @@ import { fetchTags,
   addTag, 
   updateTag, 
   deleteTag } from '../../services/tagService';
-  import TagChip from "../Tag/TagChip"
+import TagChip from "../Tag/TagChip"
 import '../../css/tagtable.css'
 
 const TagTable: React.FC = () => {

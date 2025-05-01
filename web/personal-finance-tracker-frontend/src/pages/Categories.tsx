@@ -6,14 +6,16 @@ const Categories = () => {
 	const navigate = useNavigate();
 	return (
 		<div className="page-route-container">
-			<button className="btn" onClick={() => navigate(-1)}>
-				Go Back
-			</button>
-			<div className="title">
+			<div className='sticky-header'>
 				<h1>Categories</h1>
+				<button className="btn" onClick={() => navigate(-1)}>
+					Go Back
+				</button>
 			</div>
 			<div className="categories-container">
+				<br />
 				<CategoryTable />
+				<br />
 			</div>
 		</div>
 	);

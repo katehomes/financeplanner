@@ -7,6 +7,7 @@ import { fetchTransactions,
 import CategorySelector from './Category/CategorySelector';
 import TagSelector from './Tag/TagSelector';
 import TagChipList from './Tag/TagChipList';
+import '../css/transaction-table.css'
 
 const TransactionTable: React.FC = () => {
   const [transactions, setTransactions] = useState<Transaction[]>([]);
@@ -192,80 +193,172 @@ const TransactionTable: React.FC = () => {
 
   return (
     <div>
-      <table border={1} cellPadding={8} style={{ width: '100%', borderCollapse: 'collapse' }}>
-        <thead>
-          <tr>
-          <th onClick={() => handleSort('date')}>Date {sortBy === 'date' && (sortAsc ? '↑' : '↓')}</th>
-          <th onClick={() => handleSort('amount')}>Amount {sortBy === 'amount' && (sortAsc ? '↑' : '↓')}</th>
-          <th onClick={() => handleSort('description')}>Description {sortBy === 'description' && (sortAsc ? '↑' : '↓')}</th>
-          <th onClick={() => handleSort('categoryId')}>Category {sortBy === 'categoryId' && (sortAsc ? '↑' : '↓')}</th>
-          <th>Tags</th>
-          <th>Actions</th>
-            <th>
-              <input
-                type="checkbox"
-                checked={selectedIds.size === transactions.length && transactions.length > 0}
-                onChange={(e) => {
-                  if (e.target.checked) {
-                    setSelectedIds(new Set(sortedTransactions.map(tx => tx.id!)));
-                  } else {
-                    setSelectedIds(new Set());
-                  }
-                }}
-              />
-            </th>
-          </tr>
-        </thead>
-        <tbody>
-          {sortedTransactions.map(tx =>
-            currentlyEditingId === tx.id ? (
-              <tr key={tx.id}>
+      <div className="table-container">
+        <table className="transaction-table">
+          <thead className='transaction-header-sticky'>
+            <tr>
+            <th onClick={() => handleSort('date')}>Date {sortBy === 'date' && (sortAsc ? '↑' : '↓')}</th>
+            <th onClick={() => handleSort('amount')}>Amount {sortBy === 'amount' && (sortAsc ? '↑' : '↓')}</th>
+            <th onClick={() => handleSort('description')}>Description {sortBy === 'description' && (sortAsc ? '↑' : '↓')}</th>
+            <th onClick={() => handleSort('categoryId')}>Category {sortBy === 'categoryId' && (sortAsc ? '↑' : '↓')}</th>
+            <th>Tags</th>
+            <th>Actions</th>
+              <th>
+                <input
+                  type="checkbox"
+                  checked={selectedIds.size === transactions.length && transactions.length > 0}
+                  onChange={(e) => {
+                    if (e.target.checked) {
+                      setSelectedIds(new Set(sortedTransactions.map(tx => tx.id!)));
+                    } else {
+                      setSelectedIds(new Set());
+                    }
+                  }}
+                />
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+            {sortedTransactions.map(tx =>
+              currentlyEditingId === tx.id ? (
+                <tr key={tx.id}>
+                  <td>
+                    <input
+                      type="date"
+                      name="date"
+                      value={formatDateForInput(editTransaction!.date)}
+                      onChange={handleEditInputChange}
+                    />
+                  </td>
+                  <td>
+                    <input
+                      type="text"
+                      name="amount"
+                      value={rawEditAmount ?? formatCurrency(editTransaction!.amount)}
+                      onFocus={() => setRawEditAmount(editTransaction!.amount.toString())}
+                      onChange={e => {
+                        setRawEditAmount(e.target.value);
+                        const parsed = parseCurrency(e.target.value);
+                        setEditTransaction(prev => prev ? { ...prev, amount: parsed } : prev);
+                      }}
+                      onBlur={() => setRawEditAmount(null)}
+                    />
+                  </td>
+                  <td>
+                    <input
+                      type="text"
+                      name="description"
+                      value={editTransaction!.description || ''}
+                      onChange={handleEditInputChange}
+                    />
+                  </td>
+                  <td>
+                    <CategorySelector
+                      value={editTransaction?.categoryId ?? null}
+                      onChange={(id) =>
+                        setEditTransaction(prev => {
+                          if (!prev) return prev;
+                          return { ...prev, categoryId: id };
+                        })
+                      }
+                    />
+                  </td>
+                  <td>
+                    <TagSelector
+                      value={editTransaction?.tags ?? []}
+                      onChange={(tags) =>
+                        setEditTransaction(prev => {
+                          if (!prev) return prev;
+                          return { ...prev, tags};
+                        })
+                      }
+                    />
+                  </td>
+                  <td>
+                    <button
+                      onClick={handleSaveEdit}
+                      disabled={!isValidTransaction(editTransaction!)}
+                    >
+                      Save
+                    </button>
+                    <button onClick={handleCancelEdit}>Cancel</button>
+                  </td>
+                </tr>
+              ) : (
+                <tr key={tx.id}>
+                  <td>{new Date(tx.date).toLocaleDateString()}</td>
+                  <td>${tx.amount.toFixed(2)}</td>
+                  <td>{tx.description || '-'}</td>
+                  <td>{tx.category?.name || '-'}</td>
+                  <td>
+                    <TagChipList tags={tx.tags} />
+                  </td>
+                  <td>
+                    <button onClick={() => handleEdit(tx)}>Edit</button>
+                  </td>
+                  <td>
+                    <input
+                      type="checkbox"
+                      checked={selectedIds.has(tx.id!)}
+                      onChange={() => {
+                        setSelectedIds(prev => {
+                          const next = new Set(prev);
+                          if (next.has(tx.id!)) next.delete(tx.id!);
+                          else next.add(tx.id!);
+                          return next;
+                        });
+                      }}
+                    />
+                  </td>
+
+                </tr>
+              )
+            )}
+
+            {isAdding && (
+              <tr>
                 <td>
                   <input
                     type="date"
                     name="date"
-                    value={formatDateForInput(editTransaction!.date)}
-                    onChange={handleEditInputChange}
+                    value={newTransaction.date}
+                    onChange={handleNewInputChange}
+                    required
                   />
                 </td>
                 <td>
                   <input
-                    type="text"
-                    name="amount"
-                    value={rawEditAmount ?? formatCurrency(editTransaction!.amount)}
-                    onFocus={() => setRawEditAmount(editTransaction!.amount.toString())}
-                    onChange={e => {
-                      setRawEditAmount(e.target.value);
-                      const parsed = parseCurrency(e.target.value);
-                      setEditTransaction(prev => prev ? { ...prev, amount: parsed } : prev);
-                    }}
-                    onBlur={() => setRawEditAmount(null)}
+                  type="text"
+                  name="amount"
+                  value={rawNewAmount ?? formatCurrency(newTransaction.amount)}
+                  onFocus={() => setRawNewAmount(newTransaction.amount.toString())}
+                  onChange={e => {
+                    setRawNewAmount(e.target.value);
+                    const parsed = parseCurrency(e.target.value);
+                    setNewTransaction(prev => ({ ...prev, amount: parsed }));
+                  }}
+                  onBlur={() => setRawNewAmount(null)}
                   />
                 </td>
                 <td>
                   <input
                     type="text"
                     name="description"
-                    value={editTransaction!.description || ''}
-                    onChange={handleEditInputChange}
+                    value={newTransaction.description}
+                    onChange={handleNewInputChange}
                   />
                 </td>
                 <td>
                   <CategorySelector
-                    value={editTransaction?.categoryId ?? null}
-                    onChange={(id) =>
-                      setEditTransaction(prev => {
-                        if (!prev) return prev;
-                        return { ...prev, categoryId: id };
-                      })
-                    }
+                    value={newTransaction.categoryId ?? null}
+                    onChange={(id) => setNewTransaction(prev => ({ ...prev, categoryId: id }))}
                   />
                 </td>
                 <td>
                   <TagSelector
-                    value={editTransaction?.tags ?? []}
+                    value={newTransaction?.tags ?? []}
                     onChange={(tags) =>
-                      setEditTransaction(prev => {
+                      setNewTransaction(prev => {
                         if (!prev) return prev;
                         return { ...prev, tags};
                       })
@@ -274,124 +367,34 @@ const TransactionTable: React.FC = () => {
                 </td>
                 <td>
                   <button
-                    onClick={handleSaveEdit}
-                    disabled={!isValidTransaction(editTransaction!)}
+                    onClick={handleSaveNew}
+                    disabled={!isValidTransaction(newTransaction)}
                   >
                     Save
                   </button>
-                  <button onClick={handleCancelEdit}>Cancel</button>
+                  <button onClick={handleCancelNew}>Cancel</button>
                 </td>
               </tr>
-            ) : (
-              <tr key={tx.id}>
-                <td>{new Date(tx.date).toLocaleDateString()}</td>
-                <td>${tx.amount.toFixed(2)}</td>
-                <td>{tx.description || '-'}</td>
-                <td>{tx.category?.name || '-'}</td>
-                <td>
-                  <TagChipList tags={tx.tags} />
-                </td>
-                <td>
-                  <button onClick={() => handleEdit(tx)}>Edit</button>
-                </td>
-                <td>
-                  <input
-                    type="checkbox"
-                    checked={selectedIds.has(tx.id!)}
-                    onChange={() => {
-                      setSelectedIds(prev => {
-                        const next = new Set(prev);
-                        if (next.has(tx.id!)) next.delete(tx.id!);
-                        else next.add(tx.id!);
-                        return next;
-                      });
-                    }}
-                  />
-                </td>
+            )}
+          </tbody>
+        </table>
 
-              </tr>
-            )
-          )}
+        {!isAdding && (
+          <button style={{ marginTop: '1rem' }} onClick={handleAddClick}>
+            + Add Transaction
+          </button>
+        )}
 
-          {isAdding && (
-            <tr>
-              <td>
-                <input
-                  type="date"
-                  name="date"
-                  value={newTransaction.date}
-                  onChange={handleNewInputChange}
-                  required
-                />
-              </td>
-              <td>
-                <input
-                 type="text"
-                 name="amount"
-                 value={rawNewAmount ?? formatCurrency(newTransaction.amount)}
-                 onFocus={() => setRawNewAmount(newTransaction.amount.toString())}
-                 onChange={e => {
-                   setRawNewAmount(e.target.value);
-                   const parsed = parseCurrency(e.target.value);
-                   setNewTransaction(prev => ({ ...prev, amount: parsed }));
-                 }}
-                 onBlur={() => setRawNewAmount(null)}
-                />
-              </td>
-              <td>
-                <input
-                  type="text"
-                  name="description"
-                  value={newTransaction.description}
-                  onChange={handleNewInputChange}
-                />
-              </td>
-              <td>
-                <CategorySelector
-                  value={newTransaction.categoryId ?? null}
-                  onChange={(id) => setNewTransaction(prev => ({ ...prev, categoryId: id }))}
-                />
-              </td>
-              <td>
-                <TagSelector
-                  value={newTransaction?.tags ?? []}
-                  onChange={(tags) =>
-                    setNewTransaction(prev => {
-                      if (!prev) return prev;
-                      return { ...prev, tags};
-                    })
-                  }
-                />
-              </td>
-              <td>
-                <button
-                  onClick={handleSaveNew}
-                  disabled={!isValidTransaction(newTransaction)}
-                >
-                  Save
-                </button>
-                <button onClick={handleCancelNew}>Cancel</button>
-              </td>
-            </tr>
-          )}
-        </tbody>
-      </table>
+        {selectedIds.size > 0 && (
+          <button
+            onClick={() => setConfirmDeleteOpen(true)}
+            style={{ marginTop: '1rem', background: 'red', color: 'white' }}
+          >
+            Delete Selected ({selectedIds.size})
+          </button>
+        )}
 
-      {!isAdding && (
-        <button style={{ marginTop: '1rem' }} onClick={handleAddClick}>
-          + Add Transaction
-        </button>
-      )}
-
-      {selectedIds.size > 0 && (
-        <button
-          onClick={() => setConfirmDeleteOpen(true)}
-          style={{ marginTop: '1rem', background: 'red', color: 'white' }}
-        >
-          Delete Selected ({selectedIds.size})
-        </button>
-      )}
-
+      </div>
     </div>
   );
 };
