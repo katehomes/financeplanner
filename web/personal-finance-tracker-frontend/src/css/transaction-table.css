@@ -124,7 +124,7 @@
     .transaction-header-sticky {
         position: sticky;
         top: 0;
-        z-index: 1;
+        /* z-index: 1; */
     }
 
     .transaction-footer-sticky {
@@ -132,4 +132,10 @@
         bottom: 0;
         background-color: white;
     }
+
+.testing {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+}
       

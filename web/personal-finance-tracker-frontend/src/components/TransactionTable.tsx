@@ -1,13 +1,17 @@
 import React, { useEffect, useState } from 'react';
 import { Transaction } from '../types/transaction';
+import { Tag } from '../types/tag';
 import { fetchTransactions, 
   addTransaction, 
   updateTransaction, 
-  deleteTransaction } from '../services/transactionService';
+  deleteTransaction,
+  addTagsToTransactions,
+  setCategoryForTransactions } from '../services/transactionService';
 import CategorySelector from './Category/CategorySelector';
 import TagSelector from './Tag/TagSelector';
 import TagChipList from './Tag/TagChipList';
 import '../css/transaction-table.css'
+import { Category } from '../types/category';
 
 const TransactionTable: React.FC = () => {
   const [transactions, setTransactions] = useState<Transaction[]>([]);
@@ -28,20 +32,25 @@ const TransactionTable: React.FC = () => {
   const [selectedIds, setSelectedIds] = useState<Set<number>>(new Set());
   const [confirmDeleteOpen, setConfirmDeleteOpen] = useState(false);
 
+  const [search, setSearch] = useState('');
 
+  const [massEditTags, setMassEditTags] = useState<Tag[]>([]);
+  const [massEditCategoryId, setMassEditCategoryId] = useState<number | null>(null);
+  const [massEditAction, setMassEditAction] = useState<string>('');
+
+  
+  const loadTransactions = async () => {
+    try {
+      const data = await fetchTransactions();
+      setTransactions(data);
+    } catch (err) {
+      setError((err as Error).message || 'Failed to load transactions');
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
-    const loadTransactions = async () => {
-      try {
-        const data = await fetchTransactions();
-        setTransactions(data);
-      } catch (err) {
-        setError((err as Error).message || 'Failed to load transactions');
-      } finally {
-        setLoading(false);
-      }
-    };
-
     loadTransactions();
   }, []);
 
@@ -56,6 +65,8 @@ const TransactionTable: React.FC = () => {
       setConfirmDeleteOpen(false);
     }
   }, [confirmDeleteOpen]);
+
+  /* Sorting Functions */
   
   const handleSort = (field: keyof Transaction) => {
     if (sortBy === field) {
@@ -66,7 +77,12 @@ const TransactionTable: React.FC = () => {
     }
   };
 
-  const sortedTransactions = [...transactions].sort((a, b) => {
+  const filteredTransactions = transactions.filter((tx) =>
+    tx.description?.toLowerCase().includes(search.toLowerCase())
+  );
+  
+
+  const sortedTransactions = [...filteredTransactions].sort((a, b) => {
     if (!sortBy) return 0;
   
     const valA = a[sortBy];
@@ -84,6 +100,7 @@ const TransactionTable: React.FC = () => {
       : String(valB).localeCompare(String(valA));
   });
   
+  /* Add New Functions */
   
   const handleAddClick = () => {
     setIsAdding(true);
@@ -106,10 +123,6 @@ const TransactionTable: React.FC = () => {
     }));
   };
 
-  const isValidTransaction = (tx: Transaction): boolean => {
-    return tx.amount > 0 && tx.date.trim() !== '';
-  };
-
   const handleSaveNew = async () => {
     if (!isValidTransaction(newTransaction)) return;
 
@@ -123,6 +136,7 @@ const TransactionTable: React.FC = () => {
     }
   };
 
+  /* Edit Functions */
   const handleEdit = (tx: Transaction) => {
     setCurrentlyEditingId(tx.id!);
     setEditTransaction({ ...tx });
@@ -158,6 +172,12 @@ const TransactionTable: React.FC = () => {
     });
   };
 
+  /* Helper Functions */
+  
+  const isValidTransaction = (tx: Transaction): boolean => {
+    return tx.amount > 0 && tx.date.trim() !== '';
+  };
+
   const formatDateForInput = (dateStr: string) => {
     return new Date(dateStr).toISOString().split('T')[0];
   };
@@ -186,6 +206,31 @@ const TransactionTable: React.FC = () => {
       console.error(err);
     }
   };
+
+
+  /* Mass Edit Functions */
+  const handleAddTagsToSelected = async (tags: Tag[]) => {
+    try {
+      await addTagsToTransactions(Array.from(selectedIds), tags.map(tag => tag.id!));
+      // optionally: reload transactions or update local state
+      alert('Tags added!');
+    } catch (err) {
+      console.error(err);
+      alert('Failed to add tags.');
+    }
+  };
+  
+  
+  const handleMassSetCategory = async (categoryId?: number | null) => {
+    try {
+      await setCategoryForTransactions(Array.from(selectedIds), categoryId);
+      await loadTransactions();
+      setMassEditCategoryId(null);
+    } catch (err) {
+      console.error(err);
+    }
+  };
+  
   
 
   if (loading) return <p>Loading...</p>;
@@ -194,6 +239,69 @@ const TransactionTable: React.FC = () => {
   return (
     <div>
       <div className="table-container">
+        <div className='testing'>
+          <input
+            type="text"
+            placeholder="Search by description..."
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            style={{ marginBottom: '1rem', padding: '0.5rem', width: '100%' }}
+          />
+          {selectedIds.size > 0 && (
+            <div style={{ marginTop: '1rem', padding: '1rem', border: '1px solid #ccc' }}>
+              <p>{selectedIds.size} transaction(s) selected</p>
+
+              <select
+                name="massEditAction"
+                id="massEditActionSelect"
+                value={massEditAction}
+                onChange={(e) => setMassEditAction(e.target.value)}
+              >
+                <option value="" disabled hidden>Choose here</option>
+                <option value="add-tag">Add Tag(s)</option>
+                <option value="remove-tag">Remove Tag(s)</option>
+                <option value="category">Set Category</option>
+                <option value="delete">Delete Transaction(s)</option>
+              </select>
+
+              {massEditAction === 'add-tag' && (
+                <>
+                  <p>Add Tag(s):</p>
+                  <TagSelector value={massEditTags} onChange={(tags) => setMassEditTags(tags)} />
+                  <button onClick={() => handleAddTagsToSelected(massEditTags)}>Apply</button>
+                </>
+              )}
+
+              {/* {massEditAction === 'remove-tag' && (
+                <>
+                  <p>Remove Tag(s):</p>
+                  <TagSelector value={massEditTags} onChange={massEditTags} />
+                  <button onClick={() => handleRemoveTagsFromSelected(massEditTags)}>Apply</button>
+                </>
+              )} */}
+
+              {massEditAction === 'category' && (
+                <>
+                  <p>Set Category:</p>
+                  <CategorySelector value={massEditCategoryId} onChange={setMassEditCategoryId} />
+                  <button onClick={() => handleMassSetCategory(massEditCategoryId)}>Apply</button>
+                </>
+              )}
+
+              {/* {massEditAction === 'delete' && (
+                <>
+                  <p>Are you sure you want to delete {selectedIds.length} transaction(s)?</p>
+                  <button onClick={handleDeleteSelected} style={{ color: 'red' }}>
+                    Confirm Delete
+                  </button>
+                </>
+              )} */}
+
+            </div>
+          )}
+
+        </div>
+        
         <table className="transaction-table">
           <thead className='transaction-header-sticky'>
             <tr>

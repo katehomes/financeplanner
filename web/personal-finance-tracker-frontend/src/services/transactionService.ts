@@ -1,6 +1,7 @@
 import api from './apiClient';
 
 import { Transaction } from '../types/transaction';
+import { Tag } from '../types/tag';
 
 const API_BASE = process.env.REACT_APP_API_BASE_URL;  // Retrieve the environment variable 
 
@@ -30,4 +31,10 @@ export const updateTransaction = async (
 export const deleteTransaction = async (id: number) => {
   await api.delete(`/api/transaction/${id}`);
 };
+
+export const addTagsToTransactions = (ids: number[], tagIds: number[]) =>
+  api.post('/api/transaction/batch/add-tag', { ids, tagIds });
+
+export const setCategoryForTransactions = (ids: number[], categoryId?: number | null) =>
+  api.post('/api/transaction/batch/set-category', { ids, categoryId });
 

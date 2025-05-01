@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using PersonalFinanceTracker.Api.Data;
 using PersonalFinanceTracker.Api.Models;
+using PersonalFinanceTracker.Api.DTOs;
 
 namespace PersonalFinanceTracker.Api.Controllers
 {
@@ -195,6 +196,41 @@ namespace PersonalFinanceTracker.Api.Controllers
 
             _context.Tags.Add(newTag); // Track it so EF inserts it on SaveChanges
             return newTag;
+        }
+
+
+
+
+        // POST: api/transaction/batch/set-category
+        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
+        [HttpPost("batch/set-category")]
+        public async Task<IActionResult> SetCategoryForTransactions([FromBody] BatchSetCategoryRequest request)
+        {
+            if (request.Ids == null || request.Ids.Count == 0)
+                return BadRequest("No transaction IDs provided.");
+
+            // Optional: validate categoryId if not null
+            if (request.CategoryId != null)
+            {
+                var categoryExists = await _context.Categories.AnyAsync(c => c.Id == request.CategoryId);
+                if (!categoryExists)
+                    return NotFound($"Category with ID {request.CategoryId} not found.");
+            }
+
+            var transactions = await _context.Transactions
+                .Where(t => request.Ids.Contains(t.Id))
+                .ToListAsync();
+
+            if (transactions.Count == 0)
+                return NotFound("No matching transactions found.");
+
+            foreach (var tx in transactions)
+            {
+                tx.CategoryId = request.CategoryId;
+            }
+
+            await _context.SaveChangesAsync();
+            return Ok(new { updated = transactions.Count });
         }
 
     }
