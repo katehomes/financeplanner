@@ -27,6 +27,6 @@ namespace PersonalFinanceTracker.Api.Data
 
         public DbSet<Category> Categories { get; set; }
 
-public DbSet<PersonalFinanceTracker.Api.Models.Tag> Tag { get; set; } = default!;
-    }
+        public DbSet<Tag> Tags { get; set; } = default!;
+            }
 }

@@ -13,6 +13,9 @@ const Finance = () => {
             <button className="btn" onClick={() => navigate("../category")}>
                 Categories
             </button>
+            <button className="btn" onClick={() => navigate("../tag")}>
+                Tags
+            </button>
             <div className="title">
                 <h1>Finance</h1>
             </div>

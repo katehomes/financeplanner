@@ -7,6 +7,7 @@ import Finance from './pages/Finance';
 import NavBar from './components/NavBar';
 import NoMatch from './components/NoMatch';
 import Categories from './pages/Categories';
+import Tags from './pages/Tags';
 
 function App() {
   return (
@@ -18,6 +19,7 @@ function App() {
               <Route path="/about" element={<About />} />
               <Route path="/finance" element={<Finance />} />
               <Route path="/category" element={<Categories />} />
+              <Route path="/tag" element={<Tags />} />
               <Route path="*" element={<NoMatch />} />
           </Routes>
       </div>

@@ -8,7 +8,7 @@ export async function fetchTags(): Promise<Tag[]> {
   const response = await fetch(`${API_BASE}/api/tag`);
 
   console.log("response", response);
-  if (!response.ok) throw new Error('Failed to fetch categories');
+  if (!response.ok) throw new Error('Failed to fetch tags');
   return response.json();
 }
 
