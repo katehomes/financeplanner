@@ -25,14 +25,14 @@ namespace PersonalFinanceTracker.Api.Controllers
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Tag>>> GetTag()
         {
-            return await _context.Tag.ToListAsync();
+            return await _context.Tags.ToListAsync();
         }
 
         // GET: api/Tag/5
         [HttpGet("{id}")]
         public async Task<ActionResult<Tag>> GetTag(int id)
         {
-            var tag = await _context.Tag.FindAsync(id);
+            var tag = await _context.Tags.FindAsync(id);
 
             if (tag == null)
             {
@@ -78,7 +78,7 @@ namespace PersonalFinanceTracker.Api.Controllers
         [HttpPost]
         public async Task<ActionResult<Tag>> PostTag(Tag tag)
         {
-            _context.Tag.Add(tag);
+            _context.Tags.Add(tag);
             await _context.SaveChangesAsync();
 
             return CreatedAtAction("GetTag", new { id = tag.Id }, tag);
@@ -88,13 +88,13 @@ namespace PersonalFinanceTracker.Api.Controllers
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteTag(int id)
         {
-            var tag = await _context.Tag.FindAsync(id);
+            var tag = await _context.Tags.FindAsync(id);
             if (tag == null)
             {
                 return NotFound();
             }
 
-            _context.Tag.Remove(tag);
+            _context.Tags.Remove(tag);
             await _context.SaveChangesAsync();
 
             return NoContent();
@@ -102,7 +102,7 @@ namespace PersonalFinanceTracker.Api.Controllers
 
         private bool TagExists(int id)
         {
-            return _context.Tag.Any(e => e.Id == id);
+            return _context.Tags.Any(e => e.Id == id);
         }
     }
 }

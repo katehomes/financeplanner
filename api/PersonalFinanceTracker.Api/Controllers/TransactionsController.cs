@@ -55,35 +55,50 @@ namespace PersonalFinanceTracker.Api.Controllers
         public async Task<IActionResult> PutTransaction(int id, Transaction transaction)
         {
             if (id != transaction.Id)
-            {
                 return BadRequest();
-            }
 
-            _context.Entry(transaction).State = EntityState.Modified;
+            var existingTransaction = await _context.Transactions
+                .Include(t => t.Tags)
+                .FirstOrDefaultAsync(t => t.Id == id);
 
-            try
+            if (existingTransaction == null)
+                return NotFound();
+
+            // ✅ Update basic fields
+            existingTransaction.Amount = transaction.Amount;
+            existingTransaction.Date = transaction.Date.ToUniversalTime();
+            existingTransaction.Description = transaction.Description;
+            existingTransaction.CategoryId = transaction.CategoryId;
+
+            // ✅ Handle Tags: Clear and replace with resolved list
+            existingTransaction.Tags.Clear();
+
+            foreach (var tag in transaction.Tags ?? new List<Tag>())
             {
-                await _context.SaveChangesAsync();
-            }
-            catch (DbUpdateConcurrencyException)
-            {
-                if (!TransactionExists(id))
+                var existingTag = await _context.Tags
+                    .FirstOrDefaultAsync(t => t.Name.ToLower() == tag.Name.ToLower());
+
+                if (existingTag != null)
                 {
-                    return NotFound();
+                    existingTransaction.Tags.Add(existingTag);
                 }
                 else
                 {
-                    throw;
+                    var newTag = new Tag { Name = tag.Name };
+                    _context.Tags.Add(newTag);
+                    existingTransaction.Tags.Add(newTag);
                 }
             }
 
-            var updatedTransaction = await _context.Transactions
+            await _context.SaveChangesAsync();
+
+            // ✅ Re-fetch with updated tags + category
+            var updated = await _context.Transactions
                 .Include(t => t.Category)
                 .Include(t => t.Tags)
                 .FirstOrDefaultAsync(t => t.Id == id);
 
-            return Ok(transaction);
-
+            return Ok(updated);
         }
 
         // POST: api/Transaction

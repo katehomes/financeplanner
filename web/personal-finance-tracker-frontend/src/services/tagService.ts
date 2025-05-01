@@ -31,3 +31,11 @@ export const deleteTag = async (id: number) => {
   await api.delete(`/api/tag/${id}`);
 };
 
+
+export const createTag = async (name: string): Promise<Tag> => {
+  const res = await addTag({ name: name });
+
+  if (!res) throw new Error('Failed to create tag');
+  return res;
+};
+

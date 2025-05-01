@@ -16,9 +16,7 @@ namespace PersonalFinanceTracker.Api.Data
             modelBuilder.Model.SetAnnotation("Relational:HistoryTableName", "__EFMigrationsHistory");
 
             modelBuilder.Entity<Transaction>()
-                .HasMany(t => t.Tags)
-                .WithMany(t => t.Transactions)
-                .UsingEntity(j => j.ToTable("TransactionTags"));
+                .HasMany(t => t.Tags);
 
             base.OnModelCreating(modelBuilder);
         }

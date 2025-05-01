@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import CreatableSelect from 'react-select/creatable';
 import { MultiValue } from 'react-select';
 import { Tag } from '../../types/tag';
-import { fetchTags } from '../../services/tagService';
+import { fetchTags, createTag } from '../../services/tagService';
 
 type Props = {
   value: Tag[];
@@ -10,7 +10,7 @@ type Props = {
   disabled?: boolean;
 };
 
-type Option = { value: number | string; label: string };
+type Option = { value: number; label: string };
 
 const TagSelector: React.FC<Props> = ({ value, onChange, disabled = false }) => {
   const [allTags, setAllTags] = useState<Tag[]>([]);
@@ -22,31 +22,36 @@ const TagSelector: React.FC<Props> = ({ value, onChange, disabled = false }) => 
       setAllTags(data);
       setLoading(false);
     };
-
     loadTags();
   }, []);
 
   const options: Option[] = allTags.map(tag => ({
-    value: tag.id ?? tag.name,
+    value: tag.id!,
     label: tag.name,
   }));
 
   const selectedOptions: Option[] = value.map(tag => ({
-    value: tag.id ?? tag.name,
+    value: tag.id!,
     label: tag.name,
   }));
 
   const handleChange = (selected: MultiValue<Option>) => {
     const tags: Tag[] = selected.map(opt => ({
-      id: typeof opt.value === 'number' ? opt.value : undefined,
+      id: opt.value,
       name: opt.label,
     }));
     onChange(tags);
   };
 
-  const handleCreate = (inputValue: string) => {
-    const newTag: Tag = { name: inputValue }; // id will be set after save
-    onChange([...value, newTag]);
+  const handleCreate = async (inputValue: string) => {
+    try {
+      const newTag = await createTag(inputValue.trim());
+      setAllTags(prev => [...prev, newTag]);
+      onChange([...value, newTag]);
+    } catch (err) {
+      alert("Failed to create new tag");
+      console.error(err);
+    }
   };
 
   return (

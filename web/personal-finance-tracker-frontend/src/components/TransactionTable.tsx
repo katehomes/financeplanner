@@ -264,9 +264,10 @@ const TransactionTable: React.FC = () => {
                   <TagSelector
                     value={editTransaction?.tags ?? []}
                     onChange={(tags) =>
-                      setEditTransaction(prev =>
-                        prev ? { ...prev, tags } : prev
-                      )
+                      setEditTransaction(prev => {
+                        if (!prev) return prev;
+                        return { ...prev, tags};
+                      })
                     }
                   />
 
