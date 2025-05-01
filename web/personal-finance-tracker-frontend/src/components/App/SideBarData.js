@@ -3,6 +3,8 @@ import * as FaIcons from "react-icons/fa";
 import * as AiIcons from "react-icons/ai";
 import * as IoIcons from "react-icons/io";
 
+import { TbTransactionDollar, TbCategory2, TbTags } from "react-icons/tb";
+
 export const SidebarData = [
   {
     title: "Home",
@@ -19,19 +21,19 @@ export const SidebarData = [
   {
     title: "Transactions",
     path: "/finance",
-    icon: <FaIcons.FaCartPlus />,
+    icon: <TbTransactionDollar />,
     cName: "nav-text",
   },
   {
     title: "Categories",
     path: "/category",
-    icon: <IoIcons.IoMdPeople />,
+    icon: <TbCategory2 />,
     cName: "nav-text",
   },
   {
     title: "Tags",
     path: "/tag",
-    icon: <FaIcons.FaEnvelopeOpenText />,
+    icon: <TbTags />,
     cName: "nav-text",
   },
   {
