@@ -6,8 +6,9 @@ import { fetchTransactions,
   addTransaction, 
   updateTransaction, 
   deleteTransaction,
-  addTagsToTransactions,
-  setCategoryForTransactions } from '../services/transactionService';
+  batchAddTagsToTransactions,
+  batchRemoveTagsFromTransactions,
+  batchSetCategoryForTransactions } from '../services/transactionService';
 import CategorySelector from './Category/CategorySelector';
 import TagSelector from './Tag/TagSelector';
 import TagChipList from './Tag/TagChipList';
@@ -210,7 +211,7 @@ const TransactionTable: React.FC = () => {
   /* Mass Edit Functions */
   const handleAddTagsToSelected = async (tags: Tag[]) => {
     try {
-      await addTagsToTransactions(Array.from(selectedIds), tags.map(tag => tag.id!));
+      await batchAddTagsToTransactions(Array.from(selectedIds), tags.map(tag => tag.id!));
       await loadTransactions();
       setMassEditTags([]);
     } catch (err) {
@@ -218,10 +219,21 @@ const TransactionTable: React.FC = () => {
       alert('Failed to add tags.');
     }
   };
+
+  const handleRemoveTagsFromSelected = async (tags: Tag[]) => {
+    try {
+      await batchRemoveTagsFromTransactions(Array.from(selectedIds), tags.map(tag => tag.id!));
+      await loadTransactions();
+      setMassEditTags([]);
+    } catch (err) {
+      console.error(err);
+      alert('Failed to remove tags.');
+    }
+  };
   
   const handleMassSetCategory = async (categoryId?: number | null) => {
     try {
-      await setCategoryForTransactions(Array.from(selectedIds), categoryId);
+      await batchSetCategoryForTransactions(Array.from(selectedIds), categoryId);
       await loadTransactions();
       setMassEditCategoryId(null);
     } catch (err) {
@@ -229,6 +241,8 @@ const TransactionTable: React.FC = () => {
       alert('Failed to set category.');
     }
   };
+
+  
   
   
 
@@ -271,13 +285,13 @@ const TransactionTable: React.FC = () => {
                 </>
               )}
 
-              {/* {massEditAction === 'remove-tag' && (
+              {massEditAction === 'remove-tag' && (
                 <>
                   <p>Remove Tag(s):</p>
-                  <TagSelector value={massEditTags} onChange={massEditTags} />
+                  <TagSelector value={massEditTags} onChange={(tags) => setMassEditTags(tags)} />
                   <button onClick={() => handleRemoveTagsFromSelected(massEditTags)}>Apply</button>
                 </>
-              )} */}
+              )}
 
               {massEditAction === 'category' && (
                 <>
@@ -287,14 +301,17 @@ const TransactionTable: React.FC = () => {
                 </>
               )}
 
-              {/* {massEditAction === 'delete' && (
+              {massEditAction === 'delete' && (
                 <>
-                  <p>Are you sure you want to delete {selectedIds.length} transaction(s)?</p>
-                  <button onClick={handleDeleteSelected} style={{ color: 'red' }}>
-                    Confirm Delete
+                  <br/>
+                  <button
+                    onClick={() => setConfirmDeleteOpen(true)}
+                    style={{ marginTop: '1rem', background: 'red', color: 'white' }}
+                  >
+                    Delete Selected ({selectedIds.size})
                   </button>
                 </>
-              )} */}
+              )}
 
             </div>
           )}

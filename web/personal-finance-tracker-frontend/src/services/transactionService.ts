@@ -32,10 +32,14 @@ export const deleteTransaction = async (id: number) => {
   await api.delete(`/api/transaction/${id}`);
 };
 
-export const addTagsToTransactions = async (ids: number[], tagIds: number[]) => {
-  await api.post('/api/transaction/batch/add-tag', { ids, tagIds });
+export const batchRemoveTagsFromTransactions = async (ids: number[], tagIds: number[]) => {
+  await api.post('/api/transaction/batch/remove-tags', { ids, tagIds });
 }
 
-export const setCategoryForTransactions = async (ids: number[], categoryId?: number | null) => {
+export const batchAddTagsToTransactions = async (ids: number[], tagIds: number[]) => {
+  await api.post('/api/transaction/batch/add-tags', { ids, tagIds });
+}
+
+export const batchSetCategoryForTransactions = async (ids: number[], categoryId?: number | null) => {
   await api.post('/api/transaction/batch/set-category', { ids, categoryId });
 }

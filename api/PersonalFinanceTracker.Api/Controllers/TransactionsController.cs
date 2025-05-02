@@ -26,11 +26,16 @@ namespace PersonalFinanceTracker.Api.Controllers
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Transaction>>> GetTransaction()
         {
-            return await _context.Transactions
+            var transactions = await _context.Transactions
                 .Include(t => t.Category)
-                .Include(t => t.Tags)
+                .Include(t => t.TransactionTags)
+                    .ThenInclude(tt => tt.Tag)
                 .OrderBy(t => t.Id)
                 .ToListAsync();
+
+            PopulateTags(transactions);
+
+            return transactions;
         }
 
         // GET: api/Transaction/5
@@ -46,6 +51,8 @@ namespace PersonalFinanceTracker.Api.Controllers
             {
                 return NotFound();
             }
+
+            PopulateTags([transaction]);
 
             return transaction;
         }
@@ -241,8 +248,49 @@ namespace PersonalFinanceTracker.Api.Controllers
 
         // POST: api/transaction/batch/add-tag
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
-        [HttpPost("batch/add-tag")]
-        public async Task<IActionResult> AddTagsToTransactions([FromBody] BatchAddTagsRequest request)
+        [HttpPost("batch/remove-tags")]
+        public async Task<IActionResult> RemoveTagsFromTransactions([FromBody] BatchAlterTagsRequest request)
+        {
+            if (request.Ids == null || request.Ids.Count == 0 || request.TagIds == null || request.TagIds.Count == 0)
+                return BadRequest("Transaction IDs and Tag IDs are required.");
+
+            var transactions = await _context.Transactions
+                .Include(t => t.TransactionTags)
+                .Where(t => request.Ids.Contains(t.Id))
+                .ToListAsync();
+
+            if (transactions.Count == 0)
+                return NotFound("No matching transactions found.");
+
+            var tagsToRemove = await _context.Tags
+                .Where(t => request.TagIds.Contains(t.Id))
+                .ToListAsync();
+
+            if(tagsToRemove.Count == 0)
+            return NotFound("No matching tagsToRemove found.");
+
+            foreach (var tx in transactions)
+            {
+                foreach (var tag in tagsToRemove)
+                {
+                    TransactionTag? existingTag = tx.TransactionTags.FirstOrDefault(tt => tt.TagId == tag.Id);
+                    if (existingTag != null)
+                    {
+                        tx.TransactionTags.Remove(existingTag);
+                    }
+                }
+            }
+
+            await _context.SaveChangesAsync();
+
+            return Ok(new { updated = transactions.Count, tagsAdded = tagsToRemove.Count });
+        }
+
+
+        // POST: api/transaction/batch/remove-tag
+        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
+        [HttpPost("batch/add-tags")]
+        public async Task<IActionResult> AddTagsToTransactions([FromBody] BatchAlterTagsRequest request)
         {
             if (request.Ids == null || request.Ids.Count == 0 || request.TagIds == null || request.TagIds.Count == 0)
                 return BadRequest("Transaction IDs and Tag IDs are required.");
@@ -282,5 +330,14 @@ namespace PersonalFinanceTracker.Api.Controllers
 
             return Ok(new { updated = transactions.Count, tagsAdded = tags.Count });
         }
+
+        private void PopulateTags(IEnumerable<Transaction> transactions)
+        {
+            foreach (var tx in transactions)
+            {
+                tx.Tags = tx.TransactionTags.Select(tt => tt.Tag).ToList();
+            }
+        }
+
     }
 }
