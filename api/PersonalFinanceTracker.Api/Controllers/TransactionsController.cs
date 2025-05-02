@@ -1,4 +1,6 @@
 using System;
+using System.Globalization;
+using System.IO;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -8,6 +10,8 @@ using Microsoft.EntityFrameworkCore;
 using PersonalFinanceTracker.Api.Data;
 using PersonalFinanceTracker.Api.Models;
 using PersonalFinanceTracker.Api.DTOs;
+using CsvHelper;
+using CsvHelper.Configuration;
 
 namespace PersonalFinanceTracker.Api.Controllers
 {
@@ -338,6 +342,70 @@ namespace PersonalFinanceTracker.Api.Controllers
                 tx.Tags = tx.TransactionTags.Select(tt => tt.Tag).ToList();
             }
         }
+
+
+        [HttpPost("import/preview")] //(CSV → JSON)
+        public async Task<ActionResult<List<TransactionImportRow>>> PreviewImport([FromForm] IFormFile file)
+        {
+            if (file == null || file.Length == 0)
+                return BadRequest("File is required.");
+
+            using var stream = file.OpenReadStream();
+            using var reader = new StreamReader(stream);
+            using var csv = new CsvReader(reader, new CsvConfiguration(CultureInfo.InvariantCulture)
+            {
+                TrimOptions = TrimOptions.Trim,
+                HeaderValidated = null,
+                MissingFieldFound = null
+            });
+
+            csv.Context.RegisterClassMap<TransactionImportRowMap>();
+
+            try
+            {
+                var rows = csv.GetRecords<TransactionImportRow>().ToList();
+                return Ok(rows);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest($"Error parsing CSV: {ex.Message}");
+            }
+        }
+
+        [HttpPost("import/confirm")] //(JSON → DB)
+        public async Task<IActionResult> ConfirmImport([FromBody] List<TransactionImportRow> rows)
+        {
+            if (rows == null || rows.Count == 0)
+                return BadRequest("No transactions to import.");
+
+            var createdTransactions = new List<Transaction>();
+            var existingCategories = await _context.Categories.ToDictionaryAsync(c => c.Name.ToLower());
+
+            foreach (var row in rows)
+            {
+                if (!existingCategories.TryGetValue(row.CategoryName.ToLower(), out var category))
+                {
+                    category = new Category { Name = row.CategoryName.Trim() };
+                    _context.Categories.Add(category);
+                    await _context.SaveChangesAsync(); // get ID
+                    existingCategories[category.Name.ToLower()] = category;
+                }
+
+                createdTransactions.Add(new Transaction
+                {
+                    Date = row.Date,
+                    Amount = row.Amount,
+                    Description = row.Description,
+                    CategoryId = category.Id
+                });
+            }
+
+            _context.Transactions.AddRange(createdTransactions);
+            await _context.SaveChangesAsync();
+
+            return Ok(new { imported = createdTransactions.Count });
+        }
+
 
     }
 }

@@ -1,11 +1,12 @@
 {
   "version": 2,
-  "dgSpecHash": "G7d8xQRNcQg=",
+  "dgSpecHash": "D3it5B0qsrE=",
   "success": true,
   "projectFilePath": "C:\\Users\\katel\\Desktop\\Workspace\\financeplanner\\api\\PersonalFinanceTracker.Api\\PersonalFinanceTracker.Api.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\katel\\.nuget\\packages\\azure.core\\1.38.0\\azure.core.1.38.0.nupkg.sha512",
     "C:\\Users\\katel\\.nuget\\packages\\azure.identity\\1.11.4\\azure.identity.1.11.4.nupkg.sha512",
+    "C:\\Users\\katel\\.nuget\\packages\\csvhelper\\33.0.1\\csvhelper.33.0.1.nupkg.sha512",
     "C:\\Users\\katel\\.nuget\\packages\\humanizer\\2.14.1\\humanizer.2.14.1.nupkg.sha512",
     "C:\\Users\\katel\\.nuget\\packages\\humanizer.core\\2.14.1\\humanizer.core.2.14.1.nupkg.sha512",
     "C:\\Users\\katel\\.nuget\\packages\\humanizer.core.af\\2.14.1\\humanizer.core.af.2.14.1.nupkg.sha512",
