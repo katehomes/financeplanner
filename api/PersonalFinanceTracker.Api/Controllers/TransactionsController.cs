@@ -65,22 +65,18 @@ namespace PersonalFinanceTracker.Api.Controllers
             if (existingTransaction == null)
                 return NotFound();
 
-            // ✅ Update scalar properties
             existingTransaction.Amount = transaction.Amount;
             existingTransaction.Date = transaction.Date.ToUniversalTime();
             existingTransaction.Description = transaction.Description;
             existingTransaction.CategoryId = transaction.CategoryId;
 
-            // ✅ Sync tags by ID
             var incomingTagIds = (transaction.Tags ?? new List<Tag>()).Select(t => t.Id).ToHashSet();
             var existingTagIds = existingTransaction.TransactionTags.Select(tt => tt.TagId).ToHashSet();
 
-            // Remove tags not in incoming list
             existingTransaction.TransactionTags = existingTransaction.TransactionTags
                 .Where(tt => incomingTagIds.Contains(tt.TagId))
                 .ToList();
 
-            // Add missing tags
             var newTagIds = incomingTagIds.Except(existingTagIds);
             foreach (var tagId in newTagIds)
             {
@@ -100,7 +96,6 @@ namespace PersonalFinanceTracker.Api.Controllers
                 return StatusCode(500, $"Error saving transaction: {ex.InnerException?.Message ?? ex.Message}");
             }
 
-            // ✅ Re-fetch with tag/category navigation
             var updated = await _context.Transactions
                 .Include(t => t.Category)
                 .Include(t => t.TransactionTags).ThenInclude(tt => tt.Tag)

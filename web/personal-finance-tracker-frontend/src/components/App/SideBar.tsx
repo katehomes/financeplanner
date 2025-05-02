@@ -6,12 +6,13 @@ import "../../App.css";
 
 interface SideBarProps {
   isShown: boolean;
+  toggleSidebar: () => void;
 }
 
-const SideBar: React.FC<SideBarProps> = ({ isShown }) => {
+const SideBar: React.FC<SideBarProps> = ({ isShown, toggleSidebar }) => {
   return (
     <IconContext.Provider value={{ color: "inherit" }}>
-      <nav className={isShown ? "nav-menu active" : "nav-menu"}>
+      <nav className={isShown ? "nav-menu active" : "nav-menu"} onClick={() => toggleSidebar()}>
         <ul className="nav-menu-items">
           {SidebarData.map((item, index) => (
             <li key={index} className={item.cName}>

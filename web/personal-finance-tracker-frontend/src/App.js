@@ -19,13 +19,10 @@ const App = () => {
       <div className="app-container">
         <header className="app-header">
           <h1>PFA</h1>
-          <button onClick={toggleSidebar}>
-            {isSidebarOpen ? '←' : '→'}
-          </button>
         </header>
         <div className="app-body">
           <aside className={isSidebarOpen ? "app-sidebar active" : "app-sidebar"}>
-            <SideBar isShown={isSidebarOpen} />
+            <SideBar isShown={isSidebarOpen} toggleSidebar={toggleSidebar}/>
           </aside>
           
           <main className="app-content">
