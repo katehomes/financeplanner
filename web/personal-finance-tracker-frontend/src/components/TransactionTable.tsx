@@ -1,3 +1,4 @@
+import '../css/transaction-table.css';
 import React, { useEffect, useState } from 'react';
 import { Transaction } from '../types/transaction';
 import { Tag } from '../types/tag';
@@ -10,8 +11,6 @@ import { fetchTransactions,
 import CategorySelector from './Category/CategorySelector';
 import TagSelector from './Tag/TagSelector';
 import TagChipList from './Tag/TagChipList';
-import '../css/transaction-table.css'
-import { Category } from '../types/category';
 
 const TransactionTable: React.FC = () => {
   const [transactions, setTransactions] = useState<Transaction[]>([]);
@@ -212,14 +211,13 @@ const TransactionTable: React.FC = () => {
   const handleAddTagsToSelected = async (tags: Tag[]) => {
     try {
       await addTagsToTransactions(Array.from(selectedIds), tags.map(tag => tag.id!));
-      // optionally: reload transactions or update local state
-      alert('Tags added!');
+      await loadTransactions();
+      setMassEditTags([]);
     } catch (err) {
       console.error(err);
       alert('Failed to add tags.');
     }
   };
-  
   
   const handleMassSetCategory = async (categoryId?: number | null) => {
     try {
@@ -228,6 +226,7 @@ const TransactionTable: React.FC = () => {
       setMassEditCategoryId(null);
     } catch (err) {
       console.error(err);
+      alert('Failed to set category.');
     }
   };
   

@@ -59,50 +59,61 @@ namespace PersonalFinanceTracker.Api.Controllers
                 return BadRequest();
 
             var existingTransaction = await _context.Transactions
-                .Include(t => t.Tags)
+                .Include(t => t.TransactionTags)
                 .FirstOrDefaultAsync(t => t.Id == id);
 
             if (existingTransaction == null)
                 return NotFound();
 
-            // Update scalar fields
+            // ✅ Update scalar properties
             existingTransaction.Amount = transaction.Amount;
             existingTransaction.Date = transaction.Date.ToUniversalTime();
             existingTransaction.Description = transaction.Description;
             existingTransaction.CategoryId = transaction.CategoryId;
 
-            existingTransaction.TransactionTags = new List<TransactionTag>();
+            // ✅ Sync tags by ID
+            var incomingTagIds = (transaction.Tags ?? new List<Tag>()).Select(t => t.Id).ToHashSet();
+            var existingTagIds = existingTransaction.TransactionTags.Select(tt => tt.TagId).ToHashSet();
 
-            foreach (var tag in transaction.Tags ?? new List<Tag>())
+            // Remove tags not in incoming list
+            existingTransaction.TransactionTags = existingTransaction.TransactionTags
+                .Where(tt => incomingTagIds.Contains(tt.TagId))
+                .ToList();
+
+            // Add missing tags
+            var newTagIds = incomingTagIds.Except(existingTagIds);
+            foreach (var tagId in newTagIds)
             {
-                var resolved = await ResolveTagAsync(tag);
                 existingTransaction.TransactionTags.Add(new TransactionTag
                 {
-                    Tag = resolved,
-                    Transaction = existingTransaction
+                    TransactionId = id,
+                    TagId = tagId
                 });
             }
 
-            // Clear the incoming transaction.Tags (it's not tracked by EF)
-            transaction.Tags = null;
+            try
+            {
+                await _context.SaveChangesAsync();
+            }
+            catch (DbUpdateException ex)
+            {
+                return StatusCode(500, $"Error saving transaction: {ex.InnerException?.Message ?? ex.Message}");
+            }
 
-            await _context.SaveChangesAsync();
-
-            // Re-fetch transaction with joined tags and category
+            // ✅ Re-fetch with tag/category navigation
             var updated = await _context.Transactions
                 .Include(t => t.Category)
-                .Include(t => t.TransactionTags)
-                    .ThenInclude(tt => tt.Tag)
-                .FirstOrDefaultAsync(t => t.Id == existingTransaction.Id);
+                .Include(t => t.TransactionTags).ThenInclude(tt => tt.Tag)
+                .FirstOrDefaultAsync(t => t.Id == id);
 
             if (updated != null)
             {
-                // Populate .Tags from .TransactionTags
                 updated.Tags = updated.TransactionTags.Select(tt => tt.Tag).ToList();
             }
 
             return Ok(updated);
         }
+
 
         // POST: api/Transaction
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
@@ -233,5 +244,48 @@ namespace PersonalFinanceTracker.Api.Controllers
             return Ok(new { updated = transactions.Count });
         }
 
+        // POST: api/transaction/batch/add-tag
+        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
+        [HttpPost("batch/add-tag")]
+        public async Task<IActionResult> AddTagsToTransactions([FromBody] BatchAddTagsRequest request)
+        {
+            if (request.Ids == null || request.Ids.Count == 0 || request.TagIds == null || request.TagIds.Count == 0)
+                return BadRequest("Transaction IDs and Tag IDs are required.");
+
+            var transactions = await _context.Transactions
+                .Include(t => t.TransactionTags)
+                .Where(t => request.Ids.Contains(t.Id))
+                .ToListAsync();
+
+            if (transactions.Count == 0)
+                return NotFound("No matching transactions found.");
+
+            var tags = await _context.Tags
+                .Where(t => request.TagIds.Contains(t.Id))
+                .ToListAsync();
+
+            if(tags.Count == 0)
+            return NotFound("No matching tags found.");
+
+            foreach (var tx in transactions)
+            {
+                foreach (var tag in tags)
+                {
+                    bool alreadyTagged = tx.TransactionTags.Any(tt => tt.TagId == tag.Id);
+                    if (!alreadyTagged)
+                    {
+                        tx.TransactionTags.Add(new TransactionTag
+                        {
+                            TransactionId = tx.Id,
+                            TagId = tag.Id
+                        });
+                    }
+                }
+            }
+
+            await _context.SaveChangesAsync();
+
+            return Ok(new { updated = transactions.Count, tagsAdded = tags.Count });
+        }
     }
 }
