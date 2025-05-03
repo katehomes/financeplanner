@@ -15,6 +15,7 @@ import TxTableRow from './TxTableRow';
 import TxTableEditRow from './TxTableEditRow';
 import TxTableAddRow from './TxTableAddRow';
 import TxTableHeader from './TxTableHeader';
+import TxTableControls from './TxTableControls';
 import SearchBar from '../../SearchBar';
 
 const TxTable: React.FC = () => {
@@ -183,19 +184,15 @@ const TxTable: React.FC = () => {
   return (
     <div>
       <div className="table-container">
-        <div className='testing'>
-        <SearchBar value={search} onChange={setSearch} />
-          {selectedIds.size > 0 && (
-            <BatchActionBar 
-              selectedIds = {selectedIds}
-              handleAddTagsToSelected = {handleAddTagsToSelected}
-              handleRemoveTagsFromSelected = {handleRemoveTagsFromSelected}
-              handleMassSetCategory = {handleMassSetCategory}
-              setConfirmDeleteOpen  = {setConfirmDeleteOpen}
-            />
-          )}
-
-        </div>
+        <TxTableControls
+          search={search}
+          setSearch={setSearch}
+          selectedIds={selectedIds}
+          handleAddTagsToSelected={handleAddTagsToSelected}
+          handleRemoveTagsFromSelected={handleRemoveTagsFromSelected}
+          handleMassSetCategory={handleMassSetCategory}
+          setConfirmDeleteOpen={setConfirmDeleteOpen}
+        />
         
         <table className="transaction-table">
           <TxTableHeader
