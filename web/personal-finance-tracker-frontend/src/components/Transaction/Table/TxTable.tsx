@@ -14,10 +14,11 @@ import TagSelector from '../../Tag/TagSelector';
 import TagChipList from '../../Tag/TagChipList';
 import {formatDateForInput, formatCurrency, parseCurrency} from "../../../services/helperClass";
 
+import BatchActionBar from './BatchActionBar';
 import TxTableRow from './TxTableRow';
 import TxTableEditRow from './TxTableEditRow';
 import TxTableAddRow from './TxTableAddRow';
-import BatchActionBar from './BatchActionBar';
+import TxTableHeader from './TxTableHeader';
 
 const TxTable: React.FC = () => {
   const [transactions, setTransactions] = useState<Transaction[]>([]);
@@ -228,29 +229,16 @@ const TxTable: React.FC = () => {
         </div>
         
         <table className="transaction-table">
-          <thead className='transaction-header-sticky'>
-            <tr>
-            <th onClick={() => handleSort('date')}>Date {sortBy === 'date' && (sortAsc ? '↑' : '↓')}</th>
-            <th onClick={() => handleSort('amount')}>Amount {sortBy === 'amount' && (sortAsc ? '↑' : '↓')}</th>
-            <th onClick={() => handleSort('description')}>Description {sortBy === 'description' && (sortAsc ? '↑' : '↓')}</th>
-            <th onClick={() => handleSort('categoryId')}>Category {sortBy === 'categoryId' && (sortAsc ? '↑' : '↓')}</th>
-            <th>Tags</th>
-            <th>Actions</th>
-              <th>
-                <input
-                  type="checkbox"
-                  checked={selectedIds.size === transactions.length && transactions.length > 0}
-                  onChange={(e) => {
-                    if (e.target.checked) {
-                      setSelectedIds(new Set(sortedTransactions.map(tx => tx.id!)));
-                    } else {
-                      setSelectedIds(new Set());
-                    }
-                  }}
-                />
-              </th>
-            </tr>
-          </thead>
+          <TxTableHeader
+            sortBy={sortBy}
+            sortAsc={sortAsc}
+            setSortBy={setSortBy}
+            setSortAsc={setSortAsc}
+            transactions={transactions}
+            sortedTransactions={sortedTransactions}
+            selectedIds={selectedIds}
+            setSelectedIds={setSelectedIds}
+          />
           <tbody>
             {sortedTransactions.map(tx =>
               currentlyEditingId === tx.id ? (
