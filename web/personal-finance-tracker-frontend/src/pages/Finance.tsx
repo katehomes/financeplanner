@@ -26,8 +26,6 @@ const Finance = () => {
                 <br/>
                 <TransactionTable />
                 <br/>
-                <TransactionImport />
-                <br/>
             </div>
             
         </div>

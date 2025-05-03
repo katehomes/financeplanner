@@ -14,6 +14,8 @@ import TagSelector from '../Tag/TagSelector';
 import TagChipList from '../Tag/TagChipList';
 import {formatDateForInput, formatCurrency, parseCurrency} from "../../services/helperClass";
 
+import TransactionRow from './Table/TransactionRow';
+
 const TransactionTable: React.FC = () => {
   const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [sortBy, setSortBy] = useState<keyof Transaction | null>(null);
@@ -394,33 +396,19 @@ const TransactionTable: React.FC = () => {
                   </td>
                 </tr>
               ) : (
-                <tr key={tx.id}>
-                  <td>{new Date(tx.date).toLocaleDateString()}</td>
-                  <td>${tx.amount.toFixed(2)}</td>
-                  <td>{tx.description || '-'}</td>
-                  <td>{tx.category?.name || '-'}</td>
-                  <td>
-                    <TagChipList tags={tx.tags} />
-                  </td>
-                  <td>
-                    <button onClick={() => handleEdit(tx)}>Edit</button>
-                  </td>
-                  <td>
-                    <input
-                      type="checkbox"
-                      checked={selectedIds.has(tx.id!)}
-                      onChange={() => {
-                        setSelectedIds(prev => {
-                          const next = new Set(prev);
-                          if (next.has(tx.id!)) next.delete(tx.id!);
-                          else next.add(tx.id!);
-                          return next;
-                        });
-                      }}
-                    />
-                  </td>
-
-                </tr>
+                <TransactionRow 
+                    transaction = {tx}
+                    isSelected = {selectedIds.has(tx.id!)}
+                    onSelect = {() => {
+                      setSelectedIds(prev => {
+                        const next = new Set(prev);
+                        if (next.has(tx.id!)) next.delete(tx.id!);
+                        else next.add(tx.id!);
+                        return next;
+                      });
+                    }}
+                    onEdit={() => handleEdit(tx)}
+                />
               )
             )}
 
