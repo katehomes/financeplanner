@@ -1,6 +1,6 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import TxTable from '../components/Transaction/Table/TxTable';
+import TxTableContainer from '../components/Transaction/Table/TxTableContainer';
 const Transactions = () => {
     const navigate = useNavigate();
     
@@ -23,7 +23,7 @@ const Transactions = () => {
 			</div>
             <div className="finance-container">
                 <br/>
-                <TxTable />
+                <TxTableContainer />
                 <br/>
             </div>
             

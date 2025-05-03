@@ -29,6 +29,7 @@ const TxTableAddRow: React.FC<Props> = ({onSave, onCancel }) => {
         
     return (
         <tr>
+            <td></td>
             <td>
                 <input
                 type="date"
@@ -77,16 +78,13 @@ const TxTableAddRow: React.FC<Props> = ({onSave, onCancel }) => {
                 }
                 />
             </td>
-            <td>
-                <button
-                    onClick={() => onSave(newTransaction)}
+            <td colSpan={2}>
+                <button onClick={() => onSave(newTransaction)}
                     disabled={!isValidTransaction(newTransaction)}
-                >
-                Save
+                > Save
                 </button>
                 <button onClick={onCancel}>Cancel</button>
             </td>
-            <td></td>
         </tr>
     );
 };
