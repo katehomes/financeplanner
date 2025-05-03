@@ -185,6 +185,7 @@ const TxTable: React.FC = () => {
     <div>
       <div className="table-container">
         <TxTableControls
+          resultSize={sortedTransactions.length}
           search={search}
           setSearch={setSearch}
           selectedIds={selectedIds}
@@ -206,7 +207,7 @@ const TxTable: React.FC = () => {
             setSelectedIds={setSelectedIds}
           />
           <tbody>
-            {sortedTransactions.map(tx =>
+            {sortedTransactions.map((tx, idx) =>
               currentlyEditingId === tx.id ? (
                 <TxTableEditRow 
                   transaction = {tx}
@@ -215,6 +216,7 @@ const TxTable: React.FC = () => {
                 />
               ) : (
                 <TxTableRow 
+                    index={idx + 1}
                     transaction = {tx}
                     isSelected = {selectedIds.has(tx.id!)}
                     onSelect = {() => {

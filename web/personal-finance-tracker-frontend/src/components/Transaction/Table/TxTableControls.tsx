@@ -4,6 +4,7 @@ import BatchActionBar from './BatchActionBar';
 import { Tag } from '../../../types/tag';
 
 type Props = {
+    resultSize: number | 0;
     search: string;
     setSearch: (value: string) => void;
     selectedIds: Set<number>;
@@ -14,6 +15,7 @@ type Props = {
   };
 
 const TxTableControls: React.FC<Props> = ({
+    resultSize,
     search,
     setSearch,
     selectedIds,
@@ -24,8 +26,8 @@ const TxTableControls: React.FC<Props> = ({
   }) => {
     return (
       <div className="table-controls">
-        <SearchBar value={search} onChange={setSearch} placeholder="Search transactions..." />
-        
+        <SearchBar value={search} onChange={setSearch} 
+        resultSize={resultSize} placeholder="Search transactions..." />
         {selectedIds.size > 0 && (
             <BatchActionBar
             selectedIds={selectedIds}

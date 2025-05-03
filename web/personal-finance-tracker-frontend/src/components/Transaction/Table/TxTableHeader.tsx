@@ -34,6 +34,7 @@ const TxTableHeader: React.FC<Props> = ({
   return (
     <thead className='transaction-header-sticky'>
       <tr>
+        <th></th>
         <th onClick={() => handleSort('date')}>
           Date {sortBy === 'date' && (sortAsc ? '↑' : '↓')}
         </th>

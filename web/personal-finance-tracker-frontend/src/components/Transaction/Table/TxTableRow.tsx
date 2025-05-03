@@ -3,13 +3,14 @@ import { Transaction } from '../../../types/transaction';
 import { Tag } from '../../../types/tag';
 import TagChipList from '../../Tag/TagChipList';
 type Props = {
+    index: number;
   transaction: Transaction;
   isSelected: boolean;
   onSelect: (id: number, checked: boolean) => void;
   onEdit: () => void;
 };
 
-const TxTableRow: React.FC<Props> = ({ transaction, isSelected, onSelect, onEdit }) => {
+const TxTableRow: React.FC<Props> = ({ index, transaction, isSelected, onSelect, onEdit }) => {
     const txId: number | undefined = transaction.id;
     if(!txId)
     {
@@ -18,6 +19,7 @@ const TxTableRow: React.FC<Props> = ({ transaction, isSelected, onSelect, onEdit
         
     return (
         <tr className="transaction-row">
+            <td>{index}</td>
             <td>{new Date(transaction.date).toLocaleDateString()}</td>
             <td>{transaction.amount.toFixed(2)}</td>
             <td>{transaction.description || '-'}</td>
