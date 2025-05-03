@@ -1,7 +1,6 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import TransactionTable from '../components/Transaction/TransactionTable';
-import TransactionImport from '../components/Transaction/TransactionImport';
+import TransactionTable from '../components/Transaction/Table/TxTable';
 const Finance = () => {
     const navigate = useNavigate();
     

@@ -1,22 +1,22 @@
-import '../../css/transaction-table.css';
+import '../../../css/transaction-table.css';
 import React, { useEffect, useState } from 'react';
-import { Transaction } from '../../types/transaction';
-import { Tag } from '../../types/tag';
+import { Transaction } from '../../../types/transaction';
+import { Tag } from '../../../types/tag';
 import { fetchTransactions, 
   addTransaction, 
   updateTransaction, 
   deleteTransaction,
   batchAddTagsToTransactions,
   batchRemoveTagsFromTransactions,
-  batchSetCategoryForTransactions, isValidTransaction } from '../../services/transactionService';
-import CategorySelector from '../Category/CategorySelector';
-import TagSelector from '../Tag/TagSelector';
-import TagChipList from '../Tag/TagChipList';
-import {formatDateForInput, formatCurrency, parseCurrency} from "../../services/helperClass";
+  batchSetCategoryForTransactions, isValidTransaction } from '../../../services/transactionService';
+import CategorySelector from '../../Category/CategorySelector';
+import TagSelector from '../../Tag/TagSelector';
+import TagChipList from '../../Tag/TagChipList';
+import {formatDateForInput, formatCurrency, parseCurrency} from "../../../services/helperClass";
 
-import TransactionRow from './Table/TransactionRow';
-import TransactionEditRow from './Table/TransactionEditRow';
-import TxTableAddRow from './Table/TxTableAddRow';
+import TransactionRow from './TxTableRow';
+import TransactionEditRow from './TxTableEditRow';
+import TxTableAddRow from './TxTableAddRow';
 
 const TransactionTable: React.FC = () => {
   const [transactions, setTransactions] = useState<Transaction[]>([]);
