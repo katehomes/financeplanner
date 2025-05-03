@@ -18,23 +18,24 @@ const TransactionRow: React.FC<Props> = ({ transaction, isSelected, onSelect, on
         
     return (
         <tr className="transaction-row">
-        <td>
-            <input
-            type="checkbox"
-            checked={isSelected}
-            onChange={(e) => onSelect(txId, e.target.checked)}
-            />
-        </td>
-        <td>{new Date(transaction.date).toLocaleDateString()}</td>
-        <td>{transaction.amount.toFixed(2)}</td>
-        <td>{transaction.description || '-'}</td>
-        <td>{transaction.category?.name || 'Uncategorized'}</td>
-        <td>
-            <TagChipList tags={transaction.tags as Tag[]} />
-        </td>
-        <td>
-            <button onClick={onEdit}>Edit</button>
-        </td>
+            <td>{new Date(transaction.date).toLocaleDateString()}</td>
+            <td>{transaction.amount.toFixed(2)}</td>
+            <td>{transaction.description || '-'}</td>
+            <td>{transaction.category?.name || 'Uncategorized'}</td>
+            <td>
+                <TagChipList tags={transaction.tags as Tag[]} />
+            </td>
+            <td>
+                <button onClick={onEdit}>Edit</button>
+            </td>
+            
+            <td>
+                <input
+                type="checkbox"
+                checked={isSelected}
+                onChange={(e) => onSelect(txId, e.target.checked)}
+                />
+            </td>
         </tr>
     );
 };

@@ -58,3 +58,7 @@ export const importCSVConfirm = async (transactions: Transaction[]) => {
   return response.data;
 }
 
+/* Helper Functions */
+export const isValidTransaction = (tx: Transaction): boolean => {
+  return tx.amount > 0 && tx.date.trim() !== '';
+};

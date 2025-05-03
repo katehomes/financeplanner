@@ -8,13 +8,15 @@ import { fetchTransactions,
   deleteTransaction,
   batchAddTagsToTransactions,
   batchRemoveTagsFromTransactions,
-  batchSetCategoryForTransactions } from '../../services/transactionService';
+  batchSetCategoryForTransactions, isValidTransaction } from '../../services/transactionService';
 import CategorySelector from '../Category/CategorySelector';
 import TagSelector from '../Tag/TagSelector';
 import TagChipList from '../Tag/TagChipList';
 import {formatDateForInput, formatCurrency, parseCurrency} from "../../services/helperClass";
 
 import TransactionRow from './Table/TransactionRow';
+import TransactionEditRow from './Table/TransactionEditRow';
+import TxTableAddRow from './Table/TxTableAddRow';
 
 const TransactionTable: React.FC = () => {
   const [transactions, setTransactions] = useState<Transaction[]>([]);
@@ -30,8 +32,6 @@ const TransactionTable: React.FC = () => {
   });
   const [currentlyEditingId, setCurrentlyEditingId] = useState<number | null>(null);
   const [editTransaction, setEditTransaction] = useState<Transaction | null>(null);
-  const [rawEditAmount, setRawEditAmount] = useState<string | null>(null);
-  const [rawNewAmount, setRawNewAmount] = useState<string | null>(null);
   const [selectedIds, setSelectedIds] = useState<Set<number>>(new Set());
   const [confirmDeleteOpen, setConfirmDeleteOpen] = useState(false);
 
@@ -107,30 +107,17 @@ const TransactionTable: React.FC = () => {
   
   const handleAddClick = () => {
     setIsAdding(true);
-    setNewTransaction({
-      amount: 0,
-      date: new Date().toISOString().split('T')[0],
-      description: '',
-    });
   };
 
   const handleCancelNew = () => {
     setIsAdding(false);
   };
 
-  const handleNewInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target;
-    setNewTransaction(prev => ({
-      ...prev,
-      [name]: name === 'amount' ? parseCurrency(value) || 0 : value,
-    }));
-  };
-
-  const handleSaveNew = async () => {
-    if (!isValidTransaction(newTransaction)) return;
+  const handleSaveNew = async (tx: Transaction) => {
+    if (!isValidTransaction(tx)) return;
 
     try {
-      const saved = await addTransaction(newTransaction);
+      const saved = await addTransaction(tx);
       setTransactions([...transactions, saved]);
       setIsAdding(false);
     } catch (err) {
@@ -150,10 +137,12 @@ const TransactionTable: React.FC = () => {
     setEditTransaction(null);
   };
 
-  const handleSaveEdit = async () => {
-    if (!editTransaction || !isValidTransaction(editTransaction)) return;
+  const handleSaveEdit = async (tx: Transaction) => {
 
-    const updated = await updateTransaction(editTransaction.id!, editTransaction);
+    console.log("editTransaction", tx);
+    if (!editTransaction || !isValidTransaction(tx)) return;
+
+    const updated = await updateTransaction(tx.id!, tx);
     setTransactions(prev =>
       prev.map(t => (t.id === updated.id ? updated : t))
     );
@@ -162,24 +151,7 @@ const TransactionTable: React.FC = () => {
     setEditTransaction(null);
   };
 
-  const handleEditInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target;
-  
-    setEditTransaction(prev => {
-      if (!prev) return prev;
-  
-      return {
-        ...prev,
-        [name]: name === 'amount' ? parseCurrency(value) || 0 : value,
-      };
-    });
-  };
-
   /* Helper Functions */
-  
-  const isValidTransaction = (tx: Transaction): boolean => {
-    return tx.amount > 0 && tx.date.trim() !== '';
-  };
 
   const handleConfirmDelete = async () => {
     try {
@@ -332,69 +304,11 @@ const TransactionTable: React.FC = () => {
           <tbody>
             {sortedTransactions.map(tx =>
               currentlyEditingId === tx.id ? (
-                <tr key={tx.id}>
-                  <td>
-                    <input
-                      type="date"
-                      name="date"
-                      value={formatDateForInput(editTransaction!.date)}
-                      onChange={handleEditInputChange}
-                    />
-                  </td>
-                  <td>
-                    <input
-                      type="text"
-                      name="amount"
-                      value={rawEditAmount ?? formatCurrency(editTransaction!.amount)}
-                      onFocus={() => setRawEditAmount(editTransaction!.amount.toString())}
-                      onChange={e => {
-                        setRawEditAmount(e.target.value);
-                        const parsed = parseCurrency(e.target.value);
-                        setEditTransaction(prev => prev ? { ...prev, amount: parsed } : prev);
-                      }}
-                      onBlur={() => setRawEditAmount(null)}
-                    />
-                  </td>
-                  <td>
-                    <input
-                      type="text"
-                      name="description"
-                      value={editTransaction!.description || ''}
-                      onChange={handleEditInputChange}
-                    />
-                  </td>
-                  <td>
-                    <CategorySelector
-                      value={editTransaction?.categoryId ?? null}
-                      onChange={(id) =>
-                        setEditTransaction(prev => {
-                          if (!prev) return prev;
-                          return { ...prev, categoryId: id };
-                        })
-                      }
-                    />
-                  </td>
-                  <td>
-                    <TagSelector
-                      value={editTransaction?.tags ?? []}
-                      onChange={(tags) =>
-                        setEditTransaction(prev => {
-                          if (!prev) return prev;
-                          return { ...prev, tags};
-                        })
-                      }
-                    />
-                  </td>
-                  <td>
-                    <button
-                      onClick={handleSaveEdit}
-                      disabled={!isValidTransaction(editTransaction!)}
-                    >
-                      Save
-                    </button>
-                    <button onClick={handleCancelEdit}>Cancel</button>
-                  </td>
-                </tr>
+                <TransactionEditRow 
+                  transaction = {tx}
+                  onSave = {handleSaveEdit}
+                  onCancel = {handleCancelEdit}
+                />
               ) : (
                 <TransactionRow 
                     transaction = {tx}
@@ -413,65 +327,10 @@ const TransactionTable: React.FC = () => {
             )}
 
             {isAdding && (
-              <tr>
-                <td>
-                  <input
-                    type="date"
-                    name="date"
-                    value={newTransaction.date}
-                    onChange={handleNewInputChange}
-                    required
-                  />
-                </td>
-                <td>
-                  <input
-                  type="text"
-                  name="amount"
-                  value={rawNewAmount ?? formatCurrency(newTransaction.amount)}
-                  onFocus={() => setRawNewAmount(newTransaction.amount.toString())}
-                  onChange={e => {
-                    setRawNewAmount(e.target.value);
-                    const parsed = parseCurrency(e.target.value);
-                    setNewTransaction(prev => ({ ...prev, amount: parsed }));
-                  }}
-                  onBlur={() => setRawNewAmount(null)}
-                  />
-                </td>
-                <td>
-                  <input
-                    type="text"
-                    name="description"
-                    value={newTransaction.description}
-                    onChange={handleNewInputChange}
-                  />
-                </td>
-                <td>
-                  <CategorySelector
-                    value={newTransaction.categoryId ?? null}
-                    onChange={(id) => setNewTransaction(prev => ({ ...prev, categoryId: id }))}
-                  />
-                </td>
-                <td>
-                  <TagSelector
-                    value={newTransaction?.tags ?? []}
-                    onChange={(tags) =>
-                      setNewTransaction(prev => {
-                        if (!prev) return prev;
-                        return { ...prev, tags};
-                      })
-                    }
-                  />
-                </td>
-                <td>
-                  <button
-                    onClick={handleSaveNew}
-                    disabled={!isValidTransaction(newTransaction)}
-                  >
-                    Save
-                  </button>
-                  <button onClick={handleCancelNew}>Cancel</button>
-                </td>
-              </tr>
+              <TxTableAddRow 
+                onCancel={handleCancelNew}
+                onSave={handleSaveNew}
+              />
             )}
           </tbody>
         </table>
