@@ -9,7 +9,7 @@ type Props = {
   onEdit: () => void;
 };
 
-const TransactionRow: React.FC<Props> = ({ transaction, isSelected, onSelect, onEdit }) => {
+const TxTableRow: React.FC<Props> = ({ transaction, isSelected, onSelect, onEdit }) => {
     const txId: number | undefined = transaction.id;
     if(!txId)
     {
@@ -40,4 +40,4 @@ const TransactionRow: React.FC<Props> = ({ transaction, isSelected, onSelect, on
     );
 };
 
-export default TransactionRow;
+export default TxTableRow;

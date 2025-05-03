@@ -1,0 +1,29 @@
+
+.batch-action-bar {
+    margin-bottom: 1rem;
+    padding: 1rem;
+    border: 1px solid #ccc;
+    max-width: 20rem;
+    display: flex;
+    flex-direction: column;
+}
+
+.bab-button {
+    margin-top: 1rem;
+    width: fit-content;
+}
+
+.bab-select {
+    margin-bottom: 1rem;
+    width: fit-content;
+}
+
+.batch-action-bar p {
+    margin-bottom: 1rem;
+}
+
+.delete-button {
+    margin-bottom: 1rem;
+    background-color: 'red';
+    color: 'white';
+}

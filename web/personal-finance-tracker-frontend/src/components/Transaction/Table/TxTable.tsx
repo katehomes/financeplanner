@@ -14,11 +14,12 @@ import TagSelector from '../../Tag/TagSelector';
 import TagChipList from '../../Tag/TagChipList';
 import {formatDateForInput, formatCurrency, parseCurrency} from "../../../services/helperClass";
 
-import TransactionRow from './TxTableRow';
-import TransactionEditRow from './TxTableEditRow';
+import TxTableRow from './TxTableRow';
+import TxTableEditRow from './TxTableEditRow';
 import TxTableAddRow from './TxTableAddRow';
+import BatchActionBar from './BatchActionBar';
 
-const TransactionTable: React.FC = () => {
+const TxTable: React.FC = () => {
   const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [sortBy, setSortBy] = useState<keyof Transaction | null>(null);
   const [sortAsc, setSortAsc] = useState(true);
@@ -84,7 +85,6 @@ const TransactionTable: React.FC = () => {
     tx.description?.toLowerCase().includes(search.toLowerCase())
   );
   
-
   const sortedTransactions = [...filteredTransactions].sort((a, b) => {
     if (!sortBy) return 0;
   
@@ -166,8 +166,8 @@ const TransactionTable: React.FC = () => {
     }
   };
 
-
   /* Mass Edit Functions */
+
   const handleAddTagsToSelected = async (tags: Tag[]) => {
     try {
       await batchAddTagsToTransactions(Array.from(selectedIds), tags.map(tag => tag.id!));
@@ -200,11 +200,7 @@ const TransactionTable: React.FC = () => {
       alert('Failed to set category.');
     }
   };
-
   
-  
-  
-
   if (loading) return <p>Loading...</p>;
   if (error) return <p style={{ color: 'red' }}>{error}</p>;
 
@@ -220,59 +216,13 @@ const TransactionTable: React.FC = () => {
             style={{ marginBottom: '1rem', padding: '0.5rem', width: '100%' }}
           />
           {selectedIds.size > 0 && (
-            <div style={{ marginTop: '1rem', padding: '1rem', border: '1px solid #ccc' }}>
-              <p>{selectedIds.size} transaction(s) selected</p>
-
-              <select
-                name="massEditAction"
-                id="massEditActionSelect"
-                value={massEditAction}
-                onChange={(e) => setMassEditAction(e.target.value)}
-              >
-                <option value="" disabled hidden>Choose here</option>
-                <option value="add-tag">Add Tag(s)</option>
-                <option value="remove-tag">Remove Tag(s)</option>
-                <option value="category">Set Category</option>
-                <option value="delete">Delete Transaction(s)</option>
-              </select>
-
-              {massEditAction === 'add-tag' && (
-                <>
-                  <p>Add Tag(s):</p>
-                  <TagSelector value={massEditTags} onChange={(tags) => setMassEditTags(tags)} />
-                  <button onClick={() => handleAddTagsToSelected(massEditTags)}>Apply</button>
-                </>
-              )}
-
-              {massEditAction === 'remove-tag' && (
-                <>
-                  <p>Remove Tag(s):</p>
-                  <TagSelector value={massEditTags} onChange={(tags) => setMassEditTags(tags)} />
-                  <button onClick={() => handleRemoveTagsFromSelected(massEditTags)}>Apply</button>
-                </>
-              )}
-
-              {massEditAction === 'category' && (
-                <>
-                  <p>Set Category:</p>
-                  <CategorySelector value={massEditCategoryId} onChange={setMassEditCategoryId} />
-                  <button onClick={() => handleMassSetCategory(massEditCategoryId)}>Apply</button>
-                </>
-              )}
-
-              {massEditAction === 'delete' && (
-                <>
-                  <br/>
-                  <button
-                    onClick={() => setConfirmDeleteOpen(true)}
-                    style={{ marginTop: '1rem', background: 'red', color: 'white' }}
-                  >
-                    Delete Selected ({selectedIds.size})
-                  </button>
-                </>
-              )}
-
-            </div>
+            <BatchActionBar 
+              selectedIds = {selectedIds}
+              handleAddTagsToSelected = {handleAddTagsToSelected}
+              handleRemoveTagsFromSelected = {handleRemoveTagsFromSelected}
+              handleMassSetCategory = {handleMassSetCategory}
+              setConfirmDeleteOpen  = {setConfirmDeleteOpen}
+            />
           )}
 
         </div>
@@ -304,13 +254,13 @@ const TransactionTable: React.FC = () => {
           <tbody>
             {sortedTransactions.map(tx =>
               currentlyEditingId === tx.id ? (
-                <TransactionEditRow 
+                <TxTableEditRow 
                   transaction = {tx}
                   onSave = {handleSaveEdit}
                   onCancel = {handleCancelEdit}
                 />
               ) : (
-                <TransactionRow 
+                <TxTableRow 
                     transaction = {tx}
                     isSelected = {selectedIds.has(tx.id!)}
                     onSelect = {() => {
@@ -355,4 +305,4 @@ const TransactionTable: React.FC = () => {
   );
 };
 
-export default TransactionTable;
+export default TxTable;

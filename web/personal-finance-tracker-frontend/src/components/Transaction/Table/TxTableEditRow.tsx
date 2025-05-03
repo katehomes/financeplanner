@@ -12,7 +12,7 @@ type Props = {
     onCancel: () => void;
 };
 
-const TransactionEditRow: React.FC<Props> = ({ transaction, onSave, onCancel }) => {
+const TxTableEditRow: React.FC<Props> = ({ transaction, onSave, onCancel }) => {
     const txId: number | undefined = transaction.id;
     const [rawEditAmount, setRawEditAmount] = useState<string | null>(null);
     const [editTransaction, setEditTransaction] = useState<Transaction>(transaction);
@@ -103,4 +103,4 @@ const TransactionEditRow: React.FC<Props> = ({ transaction, onSave, onCancel }) 
     );
 };
 
-export default TransactionEditRow;
+export default TxTableEditRow;
