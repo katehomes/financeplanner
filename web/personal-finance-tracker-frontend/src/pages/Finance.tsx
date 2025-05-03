@@ -1,7 +1,7 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import TransactionTable from '../components/TransactionTable';
-
+import TransactionTable from '../components/Transaction/TransactionTable';
+import TransactionImport from '../components/Transaction/TransactionImport';
 const Finance = () => {
     const navigate = useNavigate();
     
@@ -18,10 +18,15 @@ const Finance = () => {
                 <button className="btn" onClick={() => navigate("../tag")}>
                     Tags
                 </button>
+                <button className="btn" onClick={() => navigate("../import")}>
+                    Import
+                </button>
 			</div>
             <div className="finance-container">
                 <br/>
                 <TransactionTable />
+                <br/>
+                <TransactionImport />
                 <br/>
             </div>
             

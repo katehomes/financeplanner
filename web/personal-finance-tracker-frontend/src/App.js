@@ -9,6 +9,7 @@ import SideBar from './components/App/SideBar';
 import NoMatch from './components/NoMatch';
 import Categories from './pages/Categories';
 import Tags from './pages/Tags';
+import Import from './pages/Import';
 
 const App = () => {
 
@@ -32,6 +33,7 @@ const App = () => {
                 <Route path="/finance" element={<Finance />} />
                 <Route path="/category" element={<Categories />} />
                 <Route path="/tag" element={<Tags />} />
+                <Route path="/import" element={<Import />} />
                 <Route path="*" element={<NoMatch />} />
             </Routes>
           </main>

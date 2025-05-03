@@ -43,3 +43,18 @@ export const batchAddTagsToTransactions = async (ids: number[], tagIds: number[]
 export const batchSetCategoryForTransactions = async (ids: number[], categoryId?: number | null) => {
   await api.post('/api/transaction/batch/set-category', { ids, categoryId });
 }
+
+export const importCSVPreview = async (formData: FormData) => {
+  const response = await api.post('/api/transaction/import/preview', formData, {
+    headers: { 'Content-Type': 'multipart/form-data' },
+  });
+
+  return response.data;
+}
+
+export const importCSVConfirm = async (transactions: Transaction[]) => {
+  const response = await api.post('/api/transaction/import/confirm', transactions);
+
+  return response.data;
+}
+

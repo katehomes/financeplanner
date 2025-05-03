@@ -373,37 +373,74 @@ namespace PersonalFinanceTracker.Api.Controllers
         }
 
         [HttpPost("import/confirm")] //(JSON → DB)
-        public async Task<IActionResult> ConfirmImport([FromBody] List<TransactionImportRow> rows)
+        public async Task<IActionResult> ConfirmImport([FromBody] List<Transaction> transactions)
         {
-            if (rows == null || rows.Count == 0)
-                return BadRequest("No transactions to import.");
+            if (transactions == null || transactions.Count == 0)
+                return BadRequest("No transactions provided.");
 
-            var createdTransactions = new List<Transaction>();
-            var existingCategories = await _context.Categories.ToDictionaryAsync(c => c.Name.ToLower());
-
-            foreach (var row in rows)
+            foreach (var tx in transactions)
             {
-                if (!existingCategories.TryGetValue(row.CategoryName.ToLower(), out var category))
+                // --- CATEGORY ---
+                if (tx.Category != null && !string.IsNullOrWhiteSpace(tx.Category.Name))
                 {
-                    category = new Category { Name = row.CategoryName.Trim() };
-                    _context.Categories.Add(category);
-                    await _context.SaveChangesAsync(); // get ID
-                    existingCategories[category.Name.ToLower()] = category;
+                    var existingCat = await _context.Categories
+                        .FirstOrDefaultAsync(c => c.Name.ToLower() == tx.Category.Name.ToLower());
+
+                    if (existingCat != null)
+                    {
+                        tx.CategoryId = existingCat.Id;
+                    }
+                    else
+                    {
+                        var newCat = new Category { Name = tx.Category.Name.Trim() };
+                        _context.Categories.Add(newCat);
+                        await _context.SaveChangesAsync(); // Save to get ID
+                        tx.CategoryId = newCat.Id;
+                    }
                 }
 
-                createdTransactions.Add(new Transaction
+                // Reset navigation property
+                tx.Category = null;
+
+                // --- TAGS ---
+                tx.TransactionTags = new List<TransactionTag>();
+                foreach (var tag in tx.Tags ?? new List<Tag>())
                 {
-                    Date = row.Date,
-                    Amount = row.Amount,
-                    Description = row.Description,
-                    CategoryId = category.Id
-                });
+                    if (string.IsNullOrWhiteSpace(tag.Name)) continue;
+
+                    var existingTag = await _context.Tags
+                        .FirstOrDefaultAsync(t => t.Name.ToLower() == tag.Name.ToLower());
+
+                    Tag resolvedTag;
+                    if (existingTag != null)
+                    {
+                        resolvedTag = existingTag;
+                    }
+                    else
+                    {
+                        resolvedTag = new Tag
+                        {
+                            Name = tag.Name.Trim(),
+                            Color = tag.Color ?? "#888",
+                            Border = tag.Border,
+                            Text = tag.Text ?? "white"
+                        };
+                        _context.Tags.Add(resolvedTag);
+                        await _context.SaveChangesAsync(); // Save to get ID
+                    }
+
+                    tx.TransactionTags.Add(new TransactionTag
+                    {
+                        TagId = resolvedTag.Id
+                    });
+                }
+
+                tx.Tags = null;
+                _context.Transactions.Add(tx);
             }
 
-            _context.Transactions.AddRange(createdTransactions);
             await _context.SaveChangesAsync();
-
-            return Ok(new { imported = createdTransactions.Count });
+            return Ok(new { imported = transactions.Count });
         }
 
 

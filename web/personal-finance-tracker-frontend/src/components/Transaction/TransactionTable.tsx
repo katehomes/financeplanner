@@ -1,17 +1,18 @@
-import '../css/transaction-table.css';
+import '../../css/transaction-table.css';
 import React, { useEffect, useState } from 'react';
-import { Transaction } from '../types/transaction';
-import { Tag } from '../types/tag';
+import { Transaction } from '../../types/transaction';
+import { Tag } from '../../types/tag';
 import { fetchTransactions, 
   addTransaction, 
   updateTransaction, 
   deleteTransaction,
   batchAddTagsToTransactions,
   batchRemoveTagsFromTransactions,
-  batchSetCategoryForTransactions } from '../services/transactionService';
-import CategorySelector from './Category/CategorySelector';
-import TagSelector from './Tag/TagSelector';
-import TagChipList from './Tag/TagChipList';
+  batchSetCategoryForTransactions } from '../../services/transactionService';
+import CategorySelector from '../Category/CategorySelector';
+import TagSelector from '../Tag/TagSelector';
+import TagChipList from '../Tag/TagChipList';
+import {formatDateForInput, formatCurrency, parseCurrency} from "../../services/helperClass";
 
 const TransactionTable: React.FC = () => {
   const [transactions, setTransactions] = useState<Transaction[]>([]);
@@ -176,22 +177,6 @@ const TransactionTable: React.FC = () => {
   
   const isValidTransaction = (tx: Transaction): boolean => {
     return tx.amount > 0 && tx.date.trim() !== '';
-  };
-
-  const formatDateForInput = (dateStr: string) => {
-    return new Date(dateStr).toISOString().split('T')[0];
-  };
-
-  const formatCurrency = (value: number) =>
-    value.toLocaleString('en-US', {
-      style: 'currency',
-      currency: 'USD',
-      minimumFractionDigits: 2,
-    });
-  
-  const parseCurrency = (value: string): number => {
-    const numeric = value.replace(/[^0-9.-]+/g, ''); // Remove $ and commas
-    return parseFloat(numeric) || 0;
   };
 
   const handleConfirmDelete = async () => {
