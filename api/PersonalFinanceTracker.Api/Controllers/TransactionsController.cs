@@ -380,6 +380,8 @@ namespace PersonalFinanceTracker.Api.Controllers
 
             foreach (var tx in transactions)
             {
+                tx.Date = tx.Date.ToUniversalTime();
+
                 // --- CATEGORY ---
                 if (tx.Category != null && !string.IsNullOrWhiteSpace(tx.Category.Name))
                 {
