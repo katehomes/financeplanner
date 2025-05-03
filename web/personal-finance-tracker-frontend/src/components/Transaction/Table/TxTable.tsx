@@ -9,16 +9,13 @@ import { fetchTransactions,
   batchAddTagsToTransactions,
   batchRemoveTagsFromTransactions,
   batchSetCategoryForTransactions, isValidTransaction } from '../../../services/transactionService';
-import CategorySelector from '../../Category/CategorySelector';
-import TagSelector from '../../Tag/TagSelector';
-import TagChipList from '../../Tag/TagChipList';
-import {formatDateForInput, formatCurrency, parseCurrency} from "../../../services/helperClass";
 
 import BatchActionBar from './BatchActionBar';
 import TxTableRow from './TxTableRow';
 import TxTableEditRow from './TxTableEditRow';
 import TxTableAddRow from './TxTableAddRow';
 import TxTableHeader from './TxTableHeader';
+import SearchBar from '../../SearchBar';
 
 const TxTable: React.FC = () => {
   const [transactions, setTransactions] = useState<Transaction[]>([]);
@@ -27,22 +24,12 @@ const TxTable: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [isAdding, setIsAdding] = useState(false);
-  const [newTransaction, setNewTransaction] = useState<Transaction>({
-    amount: 0,
-    date: new Date().toISOString().split('T')[0],
-    description: '',
-  });
   const [currentlyEditingId, setCurrentlyEditingId] = useState<number | null>(null);
   const [editTransaction, setEditTransaction] = useState<Transaction | null>(null);
   const [selectedIds, setSelectedIds] = useState<Set<number>>(new Set());
   const [confirmDeleteOpen, setConfirmDeleteOpen] = useState(false);
 
   const [search, setSearch] = useState('');
-
-  const [massEditTags, setMassEditTags] = useState<Tag[]>([]);
-  const [massEditCategoryId, setMassEditCategoryId] = useState<number | null>(null);
-  const [massEditAction, setMassEditAction] = useState<string>('');
-
   
   const loadTransactions = async () => {
     try {
@@ -72,15 +59,6 @@ const TxTable: React.FC = () => {
   }, [confirmDeleteOpen]);
 
   /* Sorting Functions */
-  
-  const handleSort = (field: keyof Transaction) => {
-    if (sortBy === field) {
-      setSortAsc(!sortAsc); // toggle direction
-    } else {
-      setSortBy(field);
-      setSortAsc(true); // default to ascending on first click
-    }
-  };
 
   const filteredTransactions = transactions.filter((tx) =>
     tx.description?.toLowerCase().includes(search.toLowerCase())
@@ -173,7 +151,6 @@ const TxTable: React.FC = () => {
     try {
       await batchAddTagsToTransactions(Array.from(selectedIds), tags.map(tag => tag.id!));
       await loadTransactions();
-      setMassEditTags([]);
     } catch (err) {
       console.error(err);
       alert('Failed to add tags.');
@@ -184,7 +161,6 @@ const TxTable: React.FC = () => {
     try {
       await batchRemoveTagsFromTransactions(Array.from(selectedIds), tags.map(tag => tag.id!));
       await loadTransactions();
-      setMassEditTags([]);
     } catch (err) {
       console.error(err);
       alert('Failed to remove tags.');
@@ -195,7 +171,6 @@ const TxTable: React.FC = () => {
     try {
       await batchSetCategoryForTransactions(Array.from(selectedIds), categoryId);
       await loadTransactions();
-      setMassEditCategoryId(null);
     } catch (err) {
       console.error(err);
       alert('Failed to set category.');
@@ -209,13 +184,7 @@ const TxTable: React.FC = () => {
     <div>
       <div className="table-container">
         <div className='testing'>
-          <input
-            type="text"
-            placeholder="Search by description..."
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            style={{ marginBottom: '1rem', padding: '0.5rem', width: '100%' }}
-          />
+        <SearchBar value={search} onChange={setSearch} />
           {selectedIds.size > 0 && (
             <BatchActionBar 
               selectedIds = {selectedIds}
