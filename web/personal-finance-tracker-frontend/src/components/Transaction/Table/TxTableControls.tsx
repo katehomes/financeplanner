@@ -25,13 +25,16 @@ const TxTableControls: React.FC<Props> = ({
     return (
       <div className="table-controls">
         <SearchBar value={search} onChange={setSearch} placeholder="Search transactions..." />
-        <BatchActionBar
-          selectedIds={selectedIds}
-          handleAddTagsToSelected={handleAddTagsToSelected}
-          handleRemoveTagsFromSelected={handleRemoveTagsFromSelected}
-          handleMassSetCategory={handleMassSetCategory}
-          setConfirmDeleteOpen={setConfirmDeleteOpen}
-        />
+        
+        {selectedIds.size > 0 && (
+            <BatchActionBar
+            selectedIds={selectedIds}
+            handleAddTagsToSelected={handleAddTagsToSelected}
+            handleRemoveTagsFromSelected={handleRemoveTagsFromSelected}
+            handleMassSetCategory={handleMassSetCategory}
+            setConfirmDeleteOpen={setConfirmDeleteOpen}
+            />
+        )}
       </div>
     );
 };
