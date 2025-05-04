@@ -157,8 +157,13 @@ const handleCancelEdit = () => {
     setEditTransaction(null);
 };
 
-const handleSaveEdit = async (updated: Transaction) => {
-    if (!editTransaction || !isValidTransaction(updated)) return;
+const handleSaveEdit = async (tx: Transaction) => {
+    if (!editTransaction || !isValidTransaction(tx)) return;
+
+    const cat = categories.find(cg => (cg.id === tx.categoryId));
+
+    const updated: Transaction = {...tx, category: cat};
+    
     setTransactionsToImport(prev => prev.map(t => (t.id === updated.id ? updated : t)));
     setCurrentlyEditingId(null);
     setEditTransaction(null);

@@ -31,3 +31,10 @@ export const deleteCategory = async (id: number) => {
   await api.delete(`/api/category/${id}`);
 };
 
+export const createCategory = async (name: string): Promise<Category> => {
+  const res = await addCategory({ name: name });
+
+  if (!res) throw new Error('Failed to create category');
+  return res;
+};
+

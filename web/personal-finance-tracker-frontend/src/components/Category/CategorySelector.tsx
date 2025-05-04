@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
-import Select from 'react-select';
+import CreatableSelect from 'react-select/creatable';
 import { Category } from '../../types/category';
-import { fetchCategorys } from '../../services/categoryService';
+import { fetchCategorys, createCategory } from '../../services/categoryService';
 
 type Props = {
   value: number | null;
@@ -32,13 +32,25 @@ const CategorySelector: React.FC<Props> = ({ value, onChange, disabled = false }
 
   const selectedOption = options.find(opt => opt.value === value) ?? null;
 
+  const handleCreate = async (inputValue: string) => {
+      try {
+        const newCategory = await createCategory(inputValue.trim());
+        setCategories(prev => [...prev, newCategory]);
+        onChange(newCategory.id!);
+      } catch (err) {
+        alert("Failed to create new tag");
+        console.error(err);
+      }
+    };
+
   return (
-<Select
+<CreatableSelect
     isClearable
     isDisabled={disabled || loading}
     options={options}
     value={selectedOption}
     onChange={(selected) => onChange(selected?.value ?? null)}
+    onCreateOption={handleCreate}
     placeholder={loading ? 'Loading...' : 'Select a category'}
   />
   );
