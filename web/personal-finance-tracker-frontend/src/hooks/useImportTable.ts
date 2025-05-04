@@ -179,33 +179,62 @@ const handleSaveNew = async (saved: Transaction) => {
 
   const handleAddTagsToSelected = async (tags: Tag[]) => {
     try {
-      // await batchAddTagsToTransactions(Array.from(selectedIds), tags.map(tag => tag.id!));
-      // await loadTransactions();
+      setTransactionsToImport(prev =>
+        prev.map(tx =>
+          selectedIds.has(tx.id!)
+            ? {
+                ...tx,
+                tags: [...tx.tags!.filter(tag => !tags.some(t => t.id === tag.id)), ...tags]
+              }
+            : tx
+        )
+      );
     } catch (err) {
       alert("Failed to add tags.");
       console.error(err);
     }
   };
-
+  
   const handleRemoveTagsFromSelected = async (tags: Tag[]) => {
     try {
-      // await batchRemoveTagsFromTransactions(Array.from(selectedIds), tags.map(tag => tag.id!));
-      // await loadTransactions();
+      setTransactionsToImport(prev =>
+        prev.map(tx =>
+          selectedIds.has(tx.id!)
+            ? {
+                ...tx,
+                tags: tx.tags!.filter(tag => !tags.some(t => t.id === tag.id))
+              }
+            : tx
+        )
+      );
     } catch (err) {
       alert("Failed to remove tags.");
       console.error(err);
     }
   };
-
-  const handleMassSetCategory = async (categoryId?: number | null) => {
+  
+  const handleMassSetCategory = async (categoryId?: number | null, categoryName?: string) => {
     try {
-      // await batchSetCategoryForTransactions(Array.from(selectedIds), categoryId);
-      // await loadTransactions();
+      setTransactionsToImport(prev =>
+        prev.map(tx =>
+          selectedIds.has(tx.id!)
+            ? {
+                ...tx,
+                category: categoryId
+                  ? { id: categoryId, name: '' }
+                  : categoryName
+                    ? { name: categoryName }
+                    : undefined
+              }
+            : tx
+        )
+      );
     } catch (err) {
       alert("Failed to set category.");
       console.error(err);
     }
   };
+  
 
   return {
     state: {
