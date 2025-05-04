@@ -1,5 +1,9 @@
 .search-bar {
     margin-bottom: 1rem;
+    display: flex;
+    flex-direction: row;
+    align-items: end;
+    width: 40%;
 }
   
 .search-input {
@@ -9,8 +13,12 @@
     border-radius: 4px;
 }
 
-label {
+.results-num {
+    margin-left: .5rem;
+    margin-bottom: .25rem;
+    width: fit-content;
+    
     display: inline-block;
-    margin-left: 1rem;
+    white-space: nowrap;
 }
   

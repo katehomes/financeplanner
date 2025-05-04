@@ -19,7 +19,7 @@ const SearchBar: React.FC<Props> = ({ value, onChange, placeholder = "Search..."
                 placeholder={placeholder}
                 className="search-input"
             />
-            <label>{resultSize} results</label>
+            <span className="results-num">{resultSize} results</span>
         </div>
     </>
   );
