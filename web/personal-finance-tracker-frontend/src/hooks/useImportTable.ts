@@ -183,7 +183,7 @@ const handleSaveNew = async (saved: Transaction) => {
   const handleConfirmDelete = async () => {
     try {
       // await Promise.all(Array.from(selectedIds).map(id => deleteTransaction(id)));
-      alert("await Promise.all(Array.from(selectedIds).map(id => deleteTransaction(id)));");
+      //alert("await Promise.all(Array.from(selectedIds).map(id => deleteTransaction(id)));");
       setTransactionsToImport(prev => prev.filter(tx => !selectedIds.has(tx.id!)));
       setSelectedIds(new Set());
     } catch (err) {
