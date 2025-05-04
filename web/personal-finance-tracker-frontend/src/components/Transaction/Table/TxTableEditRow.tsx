@@ -36,7 +36,7 @@ const TxTableEditRow: React.FC<Props> = ({ transaction, onSave, onCancel }) => {
     }
         
     return (
-        <tr key={txId}>
+        <tr key={'edit-' + txId}>
             <td>
                 <input
                     type="date"

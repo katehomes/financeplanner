@@ -1,0 +1,157 @@
+.controls {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+
+    
+    
+}
+
+.controls input, .controls button {
+    width: fit-content;
+    margin-right: 1rem;
+}
+
+.table-container {
+    padding: 2rem;
+    max-width: 70em;
+    margin: 0 auto;
+    background-color: #fff;
+    border-radius: 12px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+  }
+  
+  .import-table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0 8px;
+    font-size: 0.95rem;
+    color: #333;
+  }
+
+  .import-table tbody tr:not(:last-child) {
+    border-bottom: 8px solid transparent;
+  }
+  
+  
+  .import-table thead {
+    background-color: #f2f2f2;
+    text-align: left;
+  }
+  
+  .import-table th,
+  .import-table td {
+    padding: 12px;
+  }
+  
+  .import-table th {
+    position: sticky;
+    top: 0;
+    background-color: #f2f2f2;
+    z-index: 2;
+  }
+  
+  
+  .import-table tr {
+    background-color: #fafafa;
+    transition: background 0.2s ease;
+  }
+  
+  .import-table tr:nth-child(even) {
+    background-color: #f0f4f8;
+  }
+  
+  .import-table tr:hover {
+    background-color: #e8f0fe;
+  }
+  
+  .import-table input[type="text"] {
+    width: 100%;
+    max-width: 180px;
+    padding: 6px 10px;
+    font-size: 0.9rem;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    background-color: #fff;
+  }
+  
+  .import-table input[type="checkbox"] {
+    transform: scale(1.2);
+    cursor: pointer;
+  }
+  
+  button {
+    padding: 6px 12px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 0.9rem;
+    margin-right: 6px;
+    transition: background 0.2s ease;
+  }
+  
+  .save-button {
+    background-color: #4caf50;
+    color: white;
+  }
+  
+  .save-button:hover {
+    background-color: #45a049;
+  }
+  
+  .cancel-button {
+    background-color: #9e9e9e;
+    color: white;
+  }
+  
+  .cancel-button:hover {
+    background-color: #7e7e7e;
+  }
+  
+  .add-button {
+    margin-top: 1.5rem;
+    background-color: #2196f3;
+    color: white;
+  }
+  
+  .add-button:hover {
+    background-color: #1976d2;
+  }
+  
+  .delete-button {
+    margin-top: 1rem;
+    background-color: #f44336;
+    color: white;
+  }
+  
+  .delete-button:hover {
+    background-color: #d32f2f;
+  }
+  
+
+  .import-table thead ::after {
+    background-color: yellow;
+    width: 100%;
+  }
+
+
+    .import-header-sticky {
+        position: sticky;
+        top: 0;
+        /* z-index: 1; */
+    }
+
+    .import-footer-sticky {
+        position: sticky;
+        bottom: 0;
+        background-color: white;
+    }
+
+.table-controls {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: end;
+}
+      
+

@@ -17,6 +17,10 @@ export const useImportTable = () => {
   const [imported, setImported] = useState(false);
   const [error, setError] = useState<string |null>(null);
   const [selectedIds, setSelectedIds] = useState<Set<number>>(new Set());
+  const [search, setSearch] = useState('');
+
+  const [currentlyEditingId, setCurrentlyEditingId] = useState<number | null>(null);
+  const [editTransaction, setEditTransaction] = useState<Transaction | null>(null);
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setImported(false);
@@ -37,14 +41,21 @@ export const useImportTable = () => {
       const res = await importCSVPreview(formData);
       setPreviewData(res);
 
-      const importedTransactions: Transaction[] = res.map((imported: { amount: any; date: any; description: any; categoryName: any; }) => ({
+      const importedTransactions: Transaction[] = res.map((imported: PreviewTransaction, idx: number) => ({
+        id: idx + 1,
         amount: imported.amount,
         date: imported.date,
         description: imported.description,
         category: {
           name: imported.categoryName
-        }
+        },
+        tags: []
       }));
+      
+
+      console.log("imp", importedTransactions);
+      
+
       setTransactionsToImport(importedTransactions);
     } catch (err: any) {
       setError(err.response?.data || 'Failed to preview file.');
@@ -70,6 +81,30 @@ export const useImportTable = () => {
     }
   };
 
+  const filteredTransactions = transactionsToImport.filter(tx =>
+    tx.description?.toLowerCase().includes(search.toLowerCase())
+  );
+
+  /*Edit Actions*/
+
+  const handleEdit = (tx: Transaction) => {
+    setCurrentlyEditingId(tx.id!);
+    setEditTransaction({ ...tx });
+  };
+  
+const handleCancelEdit = () => {
+    setCurrentlyEditingId(null);
+    setEditTransaction(null);
+};
+
+const handleSaveEdit = async (tx: Transaction) => {
+    // if (!editTransaction || !isValidTransaction(tx)) return;
+    // const updated = await updateTransaction(tx.id!, tx);
+    // setTransactions(prev => prev.map(t => (t.id === updated.id ? updated : t)));
+    // setCurrentlyEditingId(null);
+    // setEditTransaction(null);
+};
+
   return {
     state: {
       file,
@@ -78,13 +113,21 @@ export const useImportTable = () => {
       loading,
       imported,
       error,
-      selectedIds
+      currentlyEditingId,
+      editTransaction,
+      selectedIds,
+      search
     },
+    filteredTransactions,
     handlers: {
       handleFileChange,
       handleClickPreview,
       handleClickImport,
-      setSelectedIds
+      setSelectedIds,
+      setSearch,
+      handleEdit,
+      handleCancelEdit,
+      handleSaveEdit,
     }
   };
 };

@@ -170,7 +170,7 @@ const CategoryTable: React.FC = () => {
         <tbody>
           {categories.map(cg =>
             currentlyEditingId === cg.id ? (
-              <tr key={cg.id}>
+              <tr key={'edit-' + cg.id}>
                 <td>
                   <input
                     type="text"
@@ -206,7 +206,7 @@ const CategoryTable: React.FC = () => {
                 </td>
               </tr>
             ) : (
-              <tr key={cg.id}>
+              <tr key={'row-'+cg.id}>
                 <td>{cg.name}</td>
                 <td>{cg.order || '-'}</td>
                 <td>{cg.description || '-'}</td>

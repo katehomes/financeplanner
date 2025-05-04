@@ -78,7 +78,7 @@ input {
     border: 1px solid #ccc;
     border-radius: 6px;
     width: 100%;
-    max-width: 180px;
+    /* max-width: 180px; */
     box-sizing: border-box;
 }
 

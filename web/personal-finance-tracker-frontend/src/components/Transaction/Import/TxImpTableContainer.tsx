@@ -1,6 +1,8 @@
+import '../../../css/import-table.css'
 import React from 'react';
 import useImportTable from '../../../hooks/useImportTable';
 import TxImpTable from './TxImpTable';
+import TxImpTableControls from './TxImpTableControls';
 
 const TransactionImportContainer: React.FC = () => {
   const {
@@ -11,30 +13,41 @@ const TransactionImportContainer: React.FC = () => {
       loading,
       imported,
       error,
-      selectedIds
+      currentlyEditingId,
+      selectedIds,
+      search,
     },
+    filteredTransactions,
     handlers: {
       setSelectedIds,
       handleFileChange,
       handleClickPreview,
-      handleClickImport
+      handleClickImport,
+      setSearch,
+      handleEdit,
+      handleCancelEdit,
+      handleSaveEdit,
     }
   } = useImportTable();
 
   return (
     <div>
       <h2>Import Transactions</h2>
-      <input
-        type="file"
-        accept=".csv"
-        onChange={handleFileChange}
-        disabled={loading}
-      />
-
-      <div style={{ marginTop: '1rem' }}>
+      <br />
+      <p>Select a .csv file.</p>
+      <p>Preview the imported transactions and make any edits.</p>
+      <p>Confirm and import transactions.</p>
+      <br/>
+      <div className='controls'>
+        <input
+          type="file"
+          accept=".csv"
+          onChange={handleFileChange}
+          disabled={loading}
+        />
         <button onClick={handleClickPreview} disabled={!file || loading}>
-          Preview
-        </button>
+            Preview
+          </button>
         <button
           onClick={handleClickImport}
           disabled={previewData.length === 0 || loading}
@@ -42,17 +55,35 @@ const TransactionImportContainer: React.FC = () => {
           Import
         </button>
       </div>
-
+      
       {loading && <p>Loading...</p>}
       {error && <p style={{ color: 'red' }}>{error}</p>}
       {imported && <p style={{ color: 'green' }}>Transactions imported successfully!</p>}
 
       {transactionsToImport.length > 0 && (
-        <TxImpTable
-          transactions={transactionsToImport}
-          selectedIds={selectedIds}
-          setSelectedIds={setSelectedIds}
-        />
+        <div>
+          <div className="table-container">
+            <TxImpTableControls
+              resultSize={filteredTransactions.length}
+              search={search}
+              setSearch={setSearch}
+              selectedIds={selectedIds}
+              // handleAddTagsToSelected={handleAddTagsToSelected}
+              // handleRemoveTagsFromSelected={handleRemoveTagsFromSelected}
+              // handleMassSetCategory={handleMassSetCategory}
+              // setConfirmDeleteOpen={setConfirmDeleteOpen}
+            />
+            <TxImpTable
+              transactions={filteredTransactions}
+              selectedIds={selectedIds}
+              setSelectedIds={setSelectedIds}
+              currentlyEditingId={currentlyEditingId}
+              handleEdit={handleEdit}
+              handleCancelEdit={handleCancelEdit}
+              handleSaveEdit={handleSaveEdit}
+            />
+          </div>
+        </div>
       )}
     </div>
   );

@@ -1,17 +1,26 @@
 import React from 'react';
 import { Transaction } from '../../../types/transaction';
 import TagChipList from '../../Tag/TagChipList';
+import TxTableRow from '../Table/TxTableRow';
+import TxTableEditRow from '../Table/TxTableEditRow';
 
 interface Props {
   transactions: Transaction[];
   selectedIds: Set<number>;
   setSelectedIds: React.Dispatch<React.SetStateAction<Set<number>>>;
+  currentlyEditingId: number | null;
+  handleEdit: (tx: Transaction) => void;
+    handleCancelEdit: () => void;
+    handleSaveEdit: (tx: Transaction) => void;
 }
 
-const TxImpTable: React.FC<Props> = ({ transactions, selectedIds, setSelectedIds }) => {
+const TxImpTable: React.FC<Props> = ({ 
+    transactions, selectedIds, setSelectedIds,
+    handleEdit, handleCancelEdit, handleSaveEdit, 
+    currentlyEditingId}) => {
   return (
-    <table className="transaction-table">
-      <thead className="transaction-header-sticky">
+    <table className="import-table">
+      <thead className="import-header-sticky">
         <tr>
           <th>#</th>
           <th>Date</th>
@@ -26,7 +35,7 @@ const TxImpTable: React.FC<Props> = ({ transactions, selectedIds, setSelectedIds
               checked={selectedIds.size === transactions.length && transactions.length > 0}
               onChange={(e) => {
                 if (e.target.checked) {
-                  setSelectedIds(new Set(transactions.map((tx, idx) => idx)));
+                  setSelectedIds(new Set(transactions.map((tx, idx) => tx.id!)));
                 } else {
                   setSelectedIds(new Set());
                 }
@@ -36,30 +45,41 @@ const TxImpTable: React.FC<Props> = ({ transactions, selectedIds, setSelectedIds
         </tr>
       </thead>
       <tbody>
-        {transactions.map((tx, idx) => (
-          <tr key={idx}>
-            <td>{idx + 1}</td>
-            <td>{new Date(tx.date).toLocaleDateString()}</td>
-            <td>${tx.amount.toFixed(2)}</td>
-            <td>{tx.description || '-'}</td>
-            <td>{tx.category?.name || '-'}</td>
-            <td><TagChipList tags={tx.tags} /></td>
-            <td><button disabled>Edit</button></td>
-            <td>
-              <input
-                type="checkbox"
-                checked={selectedIds.has(idx)}
-                onChange={() => {
-                  setSelectedIds((prev) => {
-                    const copy = new Set(prev);
-                    copy.has(idx) ? copy.delete(idx) : copy.add(idx);
-                    return copy;
-                  });
-                }}
-              />
-            </td>
-          </tr>
-        ))}
+        {transactions.map((tx, idx) => {
+            if(currentlyEditingId === tx.id ){
+                return (
+                    <TxTableEditRow
+                    key={`edit-${tx.id}`}
+                    transaction={tx}
+                    onSave={handleSaveEdit}
+                    onCancel={handleCancelEdit}
+                    />
+                );
+            } else { 
+                return (
+                    <TxTableRow
+                    key={`row-${tx.id}`}
+                    index={idx + 1}
+                    transaction={tx}
+                    isSelected={selectedIds.has(tx.id!)}
+                    onSelect={() => {
+                        const next = new Set(selectedIds);
+                        next.has(tx.id!) ? next.delete(tx.id!) : next.add(tx.id!);
+                        setSelectedIds(next);
+                    }}
+                    onEdit={() => handleEdit(tx)}
+                    />
+                );
+            }
+          
+        })}
+
+        {/* {isAdding && (
+          <TxTableAddRow
+            onCancel={handleCancelNew}
+            onSave={handleSaveNew}
+          />
+        )} */}
       </tbody>
     </table>
   );

@@ -1,8 +1,6 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import TransactionImport from '../components/Transaction/Import/TransactionImport';
-import '../css/page-route-container.css'
-import ImportPreviewTable from '../components/Transaction/Import/ImportPreviewTable';
+import '../css/page-route-container.css';
 import TxImpTableContainer from '../components/Transaction/Import/TxImpTableContainer';
 
 const Import = () => {
@@ -17,7 +15,6 @@ const Import = () => {
 			</div>
 			<div className="import-container">
 				<br />
-                {/* <ImportPreviewTable /> */}
 				<TxImpTableContainer />
 				<br />
 			</div>
