@@ -6,6 +6,9 @@ import {
 } from '../services/transactionService';
 import { Transaction } from '../types/transaction';
 import { Tag } from '../types/tag';
+import { Category } from '../types/category';
+
+import { fetchCategorys } from '../services/categoryService';
 
 export type PreviewTransaction = {
   date: string;
@@ -35,6 +38,8 @@ export const useImportTable = () => {
 
   const [confirmDeleteOpen, setConfirmDeleteOpen] = useState(false);
 
+  const [categories, setCategories] = useState<Category[]>([]);
+
   /* Use Effects */
 
   useEffect(() => {
@@ -44,6 +49,18 @@ export const useImportTable = () => {
       setConfirmDeleteOpen(false);
     }
   }, [confirmDeleteOpen]);
+
+  useEffect(() => {
+    const load = async () => {
+      try {
+        const data = await fetchCategorys();
+        setCategories(data);
+      } finally {
+        setLoading(false);
+      }
+    };
+    load();
+  }, []);
 
 
   /* Import / Preview */
@@ -213,28 +230,29 @@ const handleSaveNew = async (saved: Transaction) => {
     }
   };
   
-  const handleMassSetCategory = async (categoryId?: number | null, categoryName?: string) => {
+  const handleMassSetCategory = async (categoryId?: number | null) => {
     try {
+      const category = categories.find(c => c.id === categoryId);
+      console.log("cat", category);
+      console.log("cats", categories);
+  
+  
       setTransactionsToImport(prev =>
-        prev.map(tx =>
-          selectedIds.has(tx.id!)
-            ? {
-                ...tx,
-                category: categoryId
-                  ? { id: categoryId, name: '' }
-                  : categoryName
-                    ? { name: categoryName }
-                    : undefined
-              }
-            : tx
-        )
+        prev.map(tx => {
+          if (!selectedIds.has(tx.id!)) return tx;
+  
+          return {
+            ...tx,
+            categoryId: categoryId ?? null,
+            category: categoryId ? category ?? { id: categoryId, name: '' } : undefined
+          };
+        })
       );
     } catch (err) {
       alert("Failed to set category.");
       console.error(err);
     }
-  };
-  
+  };   
 
   return {
     state: {
