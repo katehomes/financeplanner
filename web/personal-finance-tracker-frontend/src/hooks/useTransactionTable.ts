@@ -66,6 +66,7 @@ const useTransactionTable = () => {
       : String(valB).localeCompare(String(valA));
   });
 
+  /* Add New */
   const handleAddClick = () => setIsAdding(true);
   const handleCancelNew = () => setIsAdding(false);
 
@@ -81,6 +82,7 @@ const useTransactionTable = () => {
     }
   };
 
+  /* Edit */
   const handleEdit = (tx: Transaction) => {
     setCurrentlyEditingId(tx.id!);
     setEditTransaction({ ...tx });
@@ -99,6 +101,7 @@ const useTransactionTable = () => {
     setEditTransaction(null);
   };
 
+  /* Delete */
   const handleConfirmDelete = async () => {
     try {
       await Promise.all(Array.from(selectedIds).map(id => deleteTransaction(id)));
@@ -109,6 +112,8 @@ const useTransactionTable = () => {
       console.error(err);
     }
   };
+
+  /* Mass Set */
 
   const handleAddTagsToSelected = async (tags: Tag[]) => {
     try {

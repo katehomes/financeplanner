@@ -10,23 +10,35 @@ const TransactionImportContainer: React.FC = () => {
       file,
       previewData,
       transactionsToImport,
-      loading,
       imported,
+      sortBy,
+      sortAsc,
+      loading,
       error,
+      isAdding,
       currentlyEditingId,
       selectedIds,
       search,
     },
-    filteredTransactions,
+    sortedTransactions,
     handlers: {
-      setSelectedIds,
       handleFileChange,
       handleClickPreview,
       handleClickImport,
+      setSortBy,
+      setSortAsc,
       setSearch,
+      setConfirmDeleteOpen,
+      setSelectedIds,
+      handleAddClick,
+      handleCancelNew,
+      handleSaveNew,
       handleEdit,
       handleCancelEdit,
       handleSaveEdit,
+      handleAddTagsToSelected,
+      handleRemoveTagsFromSelected,
+      handleMassSetCategory,
     }
   } = useImportTable();
 
@@ -64,17 +76,17 @@ const TransactionImportContainer: React.FC = () => {
         <div>
           <div className="table-container">
             <TxImpTableControls
-              resultSize={filteredTransactions.length}
+              resultSize={sortedTransactions.length}
               search={search}
               setSearch={setSearch}
               selectedIds={selectedIds}
-              // handleAddTagsToSelected={handleAddTagsToSelected}
-              // handleRemoveTagsFromSelected={handleRemoveTagsFromSelected}
-              // handleMassSetCategory={handleMassSetCategory}
-              // setConfirmDeleteOpen={setConfirmDeleteOpen}
+              handleAddTagsToSelected={handleAddTagsToSelected}
+              handleRemoveTagsFromSelected={handleRemoveTagsFromSelected}
+              handleMassSetCategory={handleMassSetCategory}
+              setConfirmDeleteOpen={setConfirmDeleteOpen}
             />
             <TxImpTable
-              transactions={filteredTransactions}
+              transactions={sortedTransactions}
               selectedIds={selectedIds}
               setSelectedIds={setSelectedIds}
               currentlyEditingId={currentlyEditingId}

@@ -8,10 +8,10 @@ type Props = {
     search: string;
     setSearch: (value: string) => void;
     selectedIds: Set<number>;
-    // handleAddTagsToSelected: (tags: Tag[]) => void;
-    // handleRemoveTagsFromSelected: (tags: Tag[]) => void;
-    // handleMassSetCategory: () => void;
-    // setConfirmDeleteOpen: (open: boolean) => void;
+    handleAddTagsToSelected: (tags: Tag[]) => void;
+    handleRemoveTagsFromSelected: (tags: Tag[]) => void;
+    handleMassSetCategory: () => void;
+    setConfirmDeleteOpen: (open: boolean) => void;
   };
 
 const TxImpTableControls: React.FC<Props> = ({
@@ -19,17 +19,17 @@ const TxImpTableControls: React.FC<Props> = ({
     search,
     setSearch,
     selectedIds,
-    // handleAddTagsToSelected,
-    // handleRemoveTagsFromSelected,
-    // handleMassSetCategory,
-    // setConfirmDeleteOpen,
+    handleAddTagsToSelected,
+    handleRemoveTagsFromSelected,
+    handleMassSetCategory,
+    setConfirmDeleteOpen,
   }) => {
     return (
       <div className="table-controls">
         <SearchBar value={search} onChange={setSearch} 
         resultSize={resultSize} placeholder="Search transactions..." />
         <p>{Array.from(selectedIds).toString()}</p>
-        {/* {selectedIds.size > 0 && (
+        {selectedIds.size > 0 && (
             <BatchActionBar
             selectedIds={selectedIds}
             handleAddTagsToSelected={handleAddTagsToSelected}
@@ -37,7 +37,7 @@ const TxImpTableControls: React.FC<Props> = ({
             handleMassSetCategory={handleMassSetCategory}
             setConfirmDeleteOpen={setConfirmDeleteOpen}
             />
-        )} */}
+        )}
       </div>
     );
 };
