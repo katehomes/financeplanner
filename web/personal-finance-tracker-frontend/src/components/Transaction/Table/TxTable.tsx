@@ -64,14 +64,14 @@ const TransactionTable: React.FC<Props> = ({
           currentlyEditingId === tx.id ? (
             <TxTableEditRow
               index={idx + 1}
-              key={'edit-${tx.id}'}
+              key={`edit-${tx.id}`}
               transaction={tx}
               onSave={handleSaveEdit}
               onCancel={handleCancelEdit}
             />
           ) : (
             <TxTableRow
-              key={'row-${tx.id}'}
+            key={`row-${tx.id}`}
               index={idx + 1}
               transaction={tx}
               isSelected={selectedIds.has(tx.id!)}
