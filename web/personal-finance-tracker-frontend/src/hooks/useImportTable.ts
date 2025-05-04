@@ -1,5 +1,9 @@
 import { useState } from 'react';
-import { importCSVPreview, importCSVConfirm } from '../services/transactionService';
+import { 
+    importCSVPreview, 
+    importCSVConfirm,
+    isValidTransaction
+} from '../services/transactionService';
 import { Transaction } from '../types/transaction';
 
 export type PreviewTransaction = {
@@ -97,12 +101,11 @@ const handleCancelEdit = () => {
     setEditTransaction(null);
 };
 
-const handleSaveEdit = async (tx: Transaction) => {
-    // if (!editTransaction || !isValidTransaction(tx)) return;
-    // const updated = await updateTransaction(tx.id!, tx);
-    // setTransactions(prev => prev.map(t => (t.id === updated.id ? updated : t)));
-    // setCurrentlyEditingId(null);
-    // setEditTransaction(null);
+const handleSaveEdit = async (updated: Transaction) => {
+    if (!editTransaction || !isValidTransaction(updated)) return;
+    setTransactionsToImport(prev => prev.map(t => (t.id === updated.id ? updated : t)));
+    setCurrentlyEditingId(null);
+    setEditTransaction(null);
 };
 
   return {

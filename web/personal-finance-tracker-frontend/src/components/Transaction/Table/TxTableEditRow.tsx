@@ -7,12 +7,13 @@ import {isValidTransaction } from '../../../services/transactionService';
 
 
 type Props = {
+    index: number;
     transaction: Transaction;
     onSave: (transaction: Transaction) => void;
     onCancel: () => void;
 };
 
-const TxTableEditRow: React.FC<Props> = ({ transaction, onSave, onCancel }) => {
+const TxTableEditRow: React.FC<Props> = ({ index, transaction, onSave, onCancel }) => {
     const txId: number | undefined = transaction.id;
     const [rawEditAmount, setRawEditAmount] = useState<string | null>(null);
     const [editTransaction, setEditTransaction] = useState<Transaction>(transaction);
@@ -37,6 +38,7 @@ const TxTableEditRow: React.FC<Props> = ({ transaction, onSave, onCancel }) => {
         
     return (
         <tr key={'edit-' + txId}>
+            <td>{index}</td>
             <td>
                 <input
                     type="date"

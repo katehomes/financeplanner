@@ -49,10 +49,11 @@ const TxImpTable: React.FC<Props> = ({
             if(currentlyEditingId === tx.id ){
                 return (
                     <TxTableEditRow
-                    key={`edit-${tx.id}`}
-                    transaction={tx}
-                    onSave={handleSaveEdit}
-                    onCancel={handleCancelEdit}
+                        index={idx + 1}
+                        key={`edit-${tx.id}`}
+                        transaction={tx}
+                        onSave={handleSaveEdit}
+                        onCancel={handleCancelEdit}
                     />
                 );
             } else { 

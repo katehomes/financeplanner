@@ -63,6 +63,7 @@ const TransactionTable: React.FC<Props> = ({
         {sortedTransactions.map((tx, idx) =>
           currentlyEditingId === tx.id ? (
             <TxTableEditRow
+              index={idx + 1}
               key={'edit-${tx.id}'}
               transaction={tx}
               onSave={handleSaveEdit}
