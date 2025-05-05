@@ -56,13 +56,13 @@ export const useImportTable = () => {
     const load = async () => {
       try {
         const data = await fetchCategorys();
-        setCategories(data);
+        setCategories([...data, ...newImportedCategories]);
       } finally {
         setLoading(false);
       }
     };
     load();
-  }, []);
+  }, [newImportedCategories]);
 
 
   /* Import / Preview */
@@ -156,22 +156,25 @@ export const useImportTable = () => {
     setEditTransaction({ ...tx });
   };
   
-const handleCancelEdit = () => {
+  const handleCancelEdit = () => {
     setCurrentlyEditingId(null);
     setEditTransaction(null);
-};
+  };
 
-const handleSaveEdit = async (tx: Transaction) => {
+  const handleSaveEdit = async (tx: Transaction) => {
     if (!editTransaction || !isValidTransaction(tx)) return;
 
-    const cat = categories.find(cg => (cg.id === tx.categoryId));
+    var cat = categories.find(cg => (cg.id === tx.categoryId));
+
+    cat = cat ? cat : newImportedCategories.find(cg => (cg.id === tx.categoryId));
+
 
     const updated: Transaction = {...tx, category: cat};
     
     setTransactionsToImport(prev => prev.map(t => (t.id === updated.id ? updated : t)));
     setCurrentlyEditingId(null);
     setEditTransaction(null);
-};
+  };
 
 /* Add New */
 const handleAddClick = () => setIsAdding(true);
@@ -265,13 +268,18 @@ const handleSaveNew = async (saved: Transaction) => {
 
   /* Category creation */
 
-  const handleCreateCategory = (trimmedName: string) => {
-    alert("CREATING")
-    const newCat: Category = { name: trimmedName, id: 999 + newImportedCategories.length };
-    setNewImportedCategories(prev => [...prev, newCat]);
-
+  const handleCreateCategory = (trimmedName: string): Promise<Category> => {
+    let newCat = categories.find(cg => cg.name === trimmedName);
+  
+    if (!newCat) {
+      newCat = { name: trimmedName, id: 999 + newImportedCategories.length };
+      setNewImportedCategories(prev => [...prev, newCat!]);
+      setCategories(prev => [...prev, newCat!]);
+    }
+  
     return Promise.resolve(newCat);
-  }
+  };
+  
 
   return {
     state: {
@@ -287,6 +295,7 @@ const handleSaveNew = async (saved: Transaction) => {
       currentlyEditingId,
       selectedIds,
       search,
+      categories,
       newImportedCategories,
     },
     sortedTransactions,

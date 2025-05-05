@@ -19,6 +19,7 @@ const TransactionImportContainer: React.FC = () => {
       currentlyEditingId,
       selectedIds,
       search,
+      categories,
       newImportedCategories
     },
     sortedTransactions,
@@ -46,39 +47,54 @@ const TransactionImportContainer: React.FC = () => {
 
   return (
     <div>
-      <h2>Import Transactions</h2>
-      <br />
-      <p>Select a .csv file.</p>
-      <p>Preview the imported transactions and make any edits.</p>
-      <p>Confirm and import transactions.</p>
-      <br/>
-      <div className='controls'>
-        <input
-          type="file"
-          accept=".csv"
-          onChange={handleFileChange}
-          disabled={loading}
-        />
-        <button onClick={handleClickPreview} disabled={!file || loading}>
-            Preview
-          </button>
-        <button
-          onClick={handleClickImport}
-          disabled={previewData.length === 0 || loading}
-        >
-          Import
-        </button>
+      <div className='import-state'>
+        <div className='import-instruct'>
+          <h2>Import Transactions</h2>
+          <br />
+          <p>Select a .csv file.</p>
+          <p>Preview the imported transactions and make any edits.</p>
+          <p>Confirm and import transactions.</p>
+          <br/>
+          <div className='controls'>
+            <input
+              type="file"
+              accept=".csv"
+              onChange={handleFileChange}
+              disabled={loading}
+            />
+            <button onClick={handleClickPreview} disabled={!file || loading}>
+                Preview
+              </button>
+            <button
+              onClick={handleClickImport}
+              disabled={previewData.length === 0 || loading}
+            >
+              Import
+            </button>
+          </div>
+        </div>
+        <div className='import-property'>
+          <span className='header'>New Categories ({newImportedCategories.length}):</span>
+          <ul>
+            {newImportedCategories.map((cg, idx) => (
+              <li key={idx}>{cg.name}</li>
+            ))}
+          </ul>
+          <span className='header'>New Tags (#{/*newImportedCategories.length*/}):</span>
+          <ul>
+            {/* {newImportedCategories.map((cg, idx) => (
+              <li key={idx}>{cg.name}</li>
+            ))} */}
+          </ul>
+        </div>
+
       </div>
-      
       {loading && <p>Loading...</p>}
       {error && <p style={{ color: 'red' }}>{error}</p>}
       {imported && <p style={{ color: 'green' }}>Transactions imported successfully!</p>}
 
       {transactionsToImport.length > 0 && (
         <div>
-          <div>
-            <>New Categories ({newImportedCategories.length}): [{newImportedCategories.map(cg => cg.name).join(", ")}]</>
-          </div>
           <div className="table-container">
             <TxImpTableControls
               resultSize={sortedTransactions.length}
