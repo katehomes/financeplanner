@@ -13,11 +13,12 @@ type Props = {
     onSave: (transaction: Transaction) => void;
     onCancel: () => void;
     onCreateCategory?: (name: string) => Promise<Category>;
+    initCategories?: Category[];
 };
 
 const TxTableEditRow: React.FC<Props> = ({ 
     index, transaction, onSave, onCancel, 
-    onCreateCategory = null
+    onCreateCategory, initCategories
 }) => {
     const txId: number | undefined = transaction.id;
     const [rawEditAmount, setRawEditAmount] = useState<string | null>(null);
@@ -84,6 +85,7 @@ const TxTableEditRow: React.FC<Props> = ({
                         })
                     }
                     {...(onCreateCategory && { onCreateCategory })} 
+                    {...(initCategories && { initCategories })} 
                 />
             </td>
             <td>

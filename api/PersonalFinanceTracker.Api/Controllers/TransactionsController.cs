@@ -370,22 +370,47 @@ namespace PersonalFinanceTracker.Api.Controllers
             try
             {
                 List<TransactionImportRow> rows = csv.GetRecords<TransactionImportRow>().ToList();
-                result.rows = rows;
 
                 var categories = await _context.Categories.ToListAsync();
 
                 List<Category> newCategories = new List<Category>();
 
-                foreach (var row in rows)
+                List<Transaction> transactions = new List<Transaction>();
+                
+                for (int i = 0; i < rows.Count; i++)
                 {
-                    var categoryExists = categories.Any(c => c.Name.Trim() == row.CategoryName.Trim());
-                    if (!categoryExists)
-                        newCategories.Add(new Category() { Name = row.CategoryName});
+                    var row = rows[i];
+                    var existingCat = categories.FirstOrDefault(
+                        c => c.Name.ToLower() == row.CategoryName.ToLower());
+
+                    var tx = new Transaction() {
+                        Id = i + 1,
+                        Amount = row.Amount,
+                        Date = row.Date,
+                        Description = row.Description,
+                    };
+
+                    if (existingCat != null){
+                        tx.Category = existingCat;
+                        tx.CategoryId = existingCat.Id;
+                    
+                    } else {
+                         var newCat = new Category() { 
+                            Name = row.CategoryName,
+                            Id = categories.Count + newCategories.Count + 1,
+                        };
+
+                        newCategories.Add(newCat);
+
+                        tx.Category = newCat;
+                        tx.CategoryId = newCat.Id;
+                    }
+
+                    transactions.Add(tx);
                 }
 
+                result.rows = transactions;
                 result.importedCategories = newCategories;
-                    
-                
                 
             }
             catch (Exception ex)
@@ -421,7 +446,7 @@ namespace PersonalFinanceTracker.Api.Controllers
                     {
                         var newCat = new Category { Name = tx.Category.Name.Trim() };
                         _context.Categories.Add(newCat);
-                        await _context.SaveChangesAsync(); // Save to get ID
+                        await _context.SaveChangesAsync();
                         tx.CategoryId = newCat.Id;
                     }
                 }

@@ -11,14 +11,16 @@ interface Props {
   setSelectedIds: React.Dispatch<React.SetStateAction<Set<number>>>;
   currentlyEditingId: number | null;
   handleEdit: (tx: Transaction) => void;
-    handleCancelEdit: () => void;
-    handleSaveEdit: (tx: Transaction) => void;
-    handleCreateCategory: (name: string) => Promise<Category>;
+  handleCancelEdit: () => void;
+  handleSaveEdit: (tx: Transaction) => void;
+  handleCreateCategory: (name: string) => Promise<Category>;
+  categories: Category[];
 }
 
 const TxImpTable: React.FC<Props> = ({ 
     transactions, selectedIds, setSelectedIds, currentlyEditingId,
-    handleEdit, handleCancelEdit, handleSaveEdit, handleCreateCategory
+    handleEdit, handleCancelEdit, handleSaveEdit, handleCreateCategory,
+    categories
 }) => {
   return (
     <table className="import-table">
@@ -57,6 +59,7 @@ const TxImpTable: React.FC<Props> = ({
                         onSave={handleSaveEdit}
                         onCancel={handleCancelEdit}
                         onCreateCategory={handleCreateCategory}
+                        initCategories={categories}
                     />
                 );
             } else { 

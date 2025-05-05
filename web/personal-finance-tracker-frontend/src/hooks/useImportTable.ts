@@ -20,7 +20,7 @@ export type PreviewTransaction = {
 
 export const useImportTable = () => {
   const [file, setFile] = useState<File | null>(null);
-  const [previewData, setPreviewData] = useState<PreviewTransaction[]>([]);
+  const [previewData, setPreviewData] = useState<Transaction[]>([]);
   const [transactionsToImport, setTransactionsToImport] = useState<Transaction[]>([]);
  
   const [loading, setLoading] = useState(false);
@@ -88,22 +88,9 @@ export const useImportTable = () => {
       setPreviewData(res.rows);
       setNewImportedCategories(res.importedCategories);
 
-      const importedTransactions: Transaction[] = res.rows.map((imported: PreviewTransaction, idx: number) => ({
-        id: idx + 1,
-        amount: imported.amount,
-        date: imported.date,
-        description: imported.description,
-        category: {
-          name: imported.categoryName
-        },
-        tags: []
-      }));
+      console.log("imp", res.rows);
       
-
-      console.log("imp", importedTransactions);
-      
-
-      setTransactionsToImport(importedTransactions);
+      setTransactionsToImport(res.rows);
     } catch (err: any) {
       setError(err.response?.data || 'Failed to preview file.');
     } finally {

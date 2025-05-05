@@ -8,11 +8,12 @@ type Props = {
   onChange: (id: number | null) => void;
   disabled?: boolean;
   onCreateCategory?: (name: string) => Promise<Category>;
+  initCategories?: Category[];
 };
 
 const CategorySelector: React.FC<Props> = ({ 
   value, onChange, disabled = false,
-  onCreateCategory,
+  onCreateCategory, initCategories
 }) => {
   const [categories, setCategories] = useState<Category[]>([]);
   const [loading, setLoading] = useState(true);
@@ -20,7 +21,7 @@ const CategorySelector: React.FC<Props> = ({
   useEffect(() => {
     const load = async () => {
       try {
-        const data = await fetchCategorys();
+        const data = initCategories ? initCategories : await fetchCategorys();
         setCategories(data);
       } finally {
         setLoading(false);

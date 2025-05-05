@@ -116,6 +116,7 @@ const TransactionImportContainer: React.FC = () => {
               handleCancelEdit={handleCancelEdit}
               handleSaveEdit={handleSaveEdit}
               handleCreateCategory={handleCreateCategory}
+              categories={categories}
             />
           </div>
         </div>
