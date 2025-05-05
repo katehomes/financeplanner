@@ -5,6 +5,7 @@ import TagSelector from '../../Tag/TagSelector';
 import {formatDateForInput, formatCurrency, parseCurrency} from "../../../services/helperClass";
 import {isValidTransaction } from '../../../services/transactionService';
 import { Category } from '../../../types/category';
+import { Tag } from '../../../types/tag';
 
 
 type Props = {
@@ -14,11 +15,13 @@ type Props = {
     onCancel: () => void;
     onCreateCategory?: (name: string) => Promise<Category>;
     initCategories?: Category[];
+    onCreateTag?: (name: string) => Promise<Tag>;
+    initTags?: Tag[];
 };
 
 const TxTableEditRow: React.FC<Props> = ({ 
     index, transaction, onSave, onCancel, 
-    onCreateCategory, initCategories
+    onCreateCategory, initCategories, onCreateTag, initTags
 }) => {
     const txId: number | undefined = transaction.id;
     const [rawEditAmount, setRawEditAmount] = useState<string | null>(null);
@@ -92,12 +95,14 @@ const TxTableEditRow: React.FC<Props> = ({
                 <TagSelector
                     value={editTransaction?.tags ?? []}
                     onChange={(tags) =>
-                    setEditTransaction(prev => {
-                        if (!prev) return prev;
-                        return { ...prev, tags};
-                    })
-                }
-            />
+                        setEditTransaction(prev => {
+                            if (!prev) return prev;
+                            return { ...prev, tags};
+                        })
+                    }
+                    {...(onCreateTag && { onCreateTag })} 
+                    {...(initTags && { initTags })} 
+                />
             </td>
             <td>
             <button

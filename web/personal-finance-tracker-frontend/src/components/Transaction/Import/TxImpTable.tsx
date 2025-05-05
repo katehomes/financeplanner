@@ -4,6 +4,7 @@ import TagChipList from '../../Tag/TagChipList';
 import TxTableRow from '../Table/TxTableRow';
 import TxTableEditRow from '../Table/TxTableEditRow';
 import { Category } from '../../../types/category';
+import { Tag } from '../../../types/tag';
 
 interface Props {
   transactions: Transaction[];
@@ -15,12 +16,14 @@ interface Props {
   handleSaveEdit: (tx: Transaction) => void;
   handleCreateCategory: (name: string) => Promise<Category>;
   categories: Category[];
+  handleCreateTag: (name: string) => Promise<Tag>;
+  tags: Tag[];
 }
 
 const TxImpTable: React.FC<Props> = ({ 
     transactions, selectedIds, setSelectedIds, currentlyEditingId,
     handleEdit, handleCancelEdit, handleSaveEdit, handleCreateCategory,
-    categories
+    categories, handleCreateTag, tags
 }) => {
   return (
     <table className="import-table">
@@ -60,6 +63,8 @@ const TxImpTable: React.FC<Props> = ({
                         onCancel={handleCancelEdit}
                         onCreateCategory={handleCreateCategory}
                         initCategories={categories}
+                        onCreateTag={handleCreateTag}
+                        initTags={tags}
                     />
                 );
             } else { 

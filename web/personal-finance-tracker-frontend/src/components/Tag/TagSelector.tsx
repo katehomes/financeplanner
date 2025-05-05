@@ -2,23 +2,28 @@ import React, { useEffect, useState } from 'react';
 import CreatableSelect from 'react-select/creatable';
 import { MultiValue } from 'react-select';
 import { Tag } from '../../types/tag';
-import { fetchTags, createTag } from '../../services/tagService';
+import { fetchTags, createTag as defaultCreateTag } from '../../services/tagService';
 
 type Props = {
   value: Tag[];
   onChange: (tags: Tag[]) => void;
   disabled?: boolean;
+  onCreateTag?: (name: string) => Promise<Tag>;
+  initTags?: Tag[];
 };
 
 type Option = { value: number; label: string };
 
-const TagSelector: React.FC<Props> = ({ value, onChange, disabled = false }) => {
+const TagSelector: React.FC<Props> = ({ 
+  value, onChange, disabled = false,
+  onCreateTag, initTags
+}) => {
   const [allTags, setAllTags] = useState<Tag[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const loadTags = async () => {
-      const data = await fetchTags();
+      const data = initTags ? initTags : await fetchTags();
       setAllTags(data);
       setLoading(false);
     };
@@ -44,8 +49,14 @@ const TagSelector: React.FC<Props> = ({ value, onChange, disabled = false }) => 
   };
 
   const handleCreate = async (inputValue: string) => {
+    const trimmed = inputValue.trim();
+    if (!trimmed) return;
+
     try {
-      const newTag = await createTag(inputValue.trim());
+      // Use custom newTag if passed, otherwise fallback to API
+      const newTag = await (onCreateTag 
+        ? onCreateTag(trimmed) 
+        : defaultCreateTag(trimmed));
       setAllTags(prev => [...prev, newTag]);
       onChange([...value, newTag]);
     } catch (err) {

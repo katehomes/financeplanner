@@ -20,7 +20,9 @@ const TransactionImportContainer: React.FC = () => {
       selectedIds,
       search,
       categories,
-      newImportedCategories
+      newImportedCategories,
+      tags,
+      newImportedTags,
     },
     sortedTransactions,
     handlers: {
@@ -42,6 +44,7 @@ const TransactionImportContainer: React.FC = () => {
       handleRemoveTagsFromSelected,
       handleMassSetCategory,
       handleCreateCategory,
+      handleCreateTag,
     }
   } = useImportTable();
 
@@ -80,11 +83,11 @@ const TransactionImportContainer: React.FC = () => {
               <li key={idx}>{cg.name}</li>
             ))}
           </ul>
-          <span className='header'>New Tags (#{/*newImportedCategories.length*/}):</span>
+          <span className='header'>New Tags ({newImportedTags.length}):</span>
           <ul>
-            {/* {newImportedCategories.map((cg, idx) => (
-              <li key={idx}>{cg.name}</li>
-            ))} */}
+            {newImportedTags.map((tag, idx) => (
+              <li key={idx}>{tag.name}</li>
+            ))}
           </ul>
         </div>
 
@@ -117,6 +120,8 @@ const TransactionImportContainer: React.FC = () => {
               handleSaveEdit={handleSaveEdit}
               handleCreateCategory={handleCreateCategory}
               categories={categories}
+              handleCreateTag={handleCreateTag}
+              tags={tags}
             />
           </div>
         </div>

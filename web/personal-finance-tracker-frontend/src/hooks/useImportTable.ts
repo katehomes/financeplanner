@@ -11,6 +11,8 @@ import { TransactionImportPreview } from '../types/transactionImportPreview';
 
 import { fetchCategorys } from '../services/categoryService';
 
+import { fetchTags } from '../services/tagService';
+
 export type PreviewTransaction = {
   date: string;
   amount: number;
@@ -42,6 +44,9 @@ export const useImportTable = () => {
   const [categories, setCategories] = useState<Category[]>([]);
   const [newImportedCategories, setNewImportedCategories] = useState<Category[]>([]);
 
+  const [tags, setTags] = useState<Tag[]>([]);
+  const [newImportedTags, setNewImportedTags] = useState<Tag[]>([]);
+
   /* Use Effects */
 
   useEffect(() => {
@@ -63,6 +68,18 @@ export const useImportTable = () => {
     };
     load();
   }, [newImportedCategories]);
+
+  useEffect(() => {
+    const load = async () => {
+      try {
+        const data = await fetchTags();
+        setTags([...data, ...newImportedTags]);
+      } finally {
+        setLoading(false);
+      }
+    };
+    load();
+  }, [newImportedTags]);
 
 
   /* Import / Preview */
@@ -266,6 +283,20 @@ const handleSaveNew = async (saved: Transaction) => {
   
     return Promise.resolve(newCat);
   };
+
+  /* Tag creation */
+
+  const handleCreateTag = (trimmedName: string): Promise<Tag> => {
+    let newTag = tags.find(tag => tag.name === trimmedName);
+  
+    if (!newTag) {
+      newTag = { name: trimmedName, id: 999 + newImportedTags.length };
+      setNewImportedTags(prev => [...prev, newTag!]);
+      setTags(prev => [...prev, newTag!]);
+    }
+  
+    return Promise.resolve(newTag);
+  };
   
 
   return {
@@ -284,6 +315,8 @@ const handleSaveNew = async (saved: Transaction) => {
       search,
       categories,
       newImportedCategories,
+      tags,
+      newImportedTags,
     },
     sortedTransactions,
     handlers: {
@@ -305,6 +338,7 @@ const handleSaveNew = async (saved: Transaction) => {
       handleRemoveTagsFromSelected,
       handleMassSetCategory,
       handleCreateCategory,
+      handleCreateTag,
     }
   };
 };
