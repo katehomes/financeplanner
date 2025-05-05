@@ -13,7 +13,7 @@ interface Props {
   handleEdit: (tx: Transaction) => void;
     handleCancelEdit: () => void;
     handleSaveEdit: (tx: Transaction) => void;
-    handleCreateCategory?: (name: string) => Category;
+    handleCreateCategory: (name: string) => Promise<Category>;
 }
 
 const TxImpTable: React.FC<Props> = ({ 

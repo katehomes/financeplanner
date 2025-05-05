@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import CreatableSelect from 'react-select/creatable';
 import { Category } from '../../types/category';
-import { fetchCategorys, createCategory } from '../../services/categoryService';
+import { fetchCategorys, createCategory as defaultCreateCategory } from '../../services/categoryService';
 
 type Props = {
   value: number | null;
@@ -12,7 +12,7 @@ type Props = {
 
 const CategorySelector: React.FC<Props> = ({ 
   value, onChange, disabled = false,
-  onCreateCategory = (trim: string)=> createCategory(trim),
+  onCreateCategory,
 }) => {
   const [categories, setCategories] = useState<Category[]>([]);
   const [loading, setLoading] = useState(true);
@@ -37,15 +37,22 @@ const CategorySelector: React.FC<Props> = ({
   const selectedOption = options.find(opt => opt.value === value) ?? null;
 
   const handleCreate = async (inputValue: string) => {
-      try {
-        const newCategory = await onCreateCategory(inputValue.trim());
-        setCategories(prev => [...prev, newCategory]);
-        onChange(newCategory.id!);
-      } catch (err) {
-        alert("Failed to create new tag");
-        console.error(err);
-      }
-    };
+    const trimmed = inputValue.trim();
+    if (!trimmed) return;
+
+    try {
+      // Use custom createCategory if passed, otherwise fallback to API
+      const newCategory = await (onCreateCategory 
+        ? onCreateCategory(trimmed) 
+        : defaultCreateCategory(trimmed));
+
+      setCategories(prev => [...prev, newCategory]);
+      onChange(newCategory.id!);
+    } catch (err) {
+      alert("Failed to create new category");
+      console.error(err);
+    }
+  };
 
   return (
 <CreatableSelect

@@ -12,7 +12,7 @@ type Props = {
     transaction: Transaction;
     onSave: (transaction: Transaction) => void;
     onCancel: () => void;
-    onCreateCategory?: (name: string) => Category;
+    onCreateCategory?: (name: string) => Promise<Category>;
 };
 
 const TxTableEditRow: React.FC<Props> = ({ 
@@ -83,9 +83,7 @@ const TxTableEditRow: React.FC<Props> = ({
                             return { ...prev, categoryId: id };
                         })
                     }
-                    { ...onCreateCategory != null && (
-                    <>onCreateCategory= {onCreateCategory}</>
-                    )}
+                    {...(onCreateCategory && { onCreateCategory })} 
                 />
             </td>
             <td>

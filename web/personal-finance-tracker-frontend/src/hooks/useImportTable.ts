@@ -266,10 +266,11 @@ const handleSaveNew = async (saved: Transaction) => {
   /* Category creation */
 
   const handleCreateCategory = (trimmedName: string) => {
+    alert("CREATING")
     const newCat: Category = { name: trimmedName, id: 999 + newImportedCategories.length };
     setNewImportedCategories(prev => [...prev, newCat]);
 
-    return newCat;
+    return Promise.resolve(newCat);
   }
 
   return {
