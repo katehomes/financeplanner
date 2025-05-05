@@ -5,10 +5,16 @@ type Props = {
   value: string;
   onChange: (value: string) => void;
   placeholder?: string;
-  resultSize: number | 0;
+  showingResultSize: number | 0;
+  totalResultSize?: number | 0;
+  showTotal?: boolean;
 };
 
-const SearchBar: React.FC<Props> = ({ value, onChange, placeholder = "Search...", resultSize }) => {
+const SearchBar: React.FC<Props> = ({ 
+  value, onChange, placeholder = "Search...", 
+  showingResultSize, totalResultSize, showTotal = false
+}) => {
+
   return (
     <>
         <div className="search-bar">
@@ -19,7 +25,12 @@ const SearchBar: React.FC<Props> = ({ value, onChange, placeholder = "Search..."
                 placeholder={placeholder}
                 className="search-input"
             />
-            <span className="results-num">{resultSize} results</span>
+            <span className="results-num">
+              <>{showingResultSize} </>
+              { showTotal && (showingResultSize != totalResultSize)  &&
+                (<>/ {totalResultSize} </>) }
+              results
+            </span>
         </div>
     </>
   );

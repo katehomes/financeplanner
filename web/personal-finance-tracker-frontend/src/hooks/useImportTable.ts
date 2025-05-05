@@ -7,6 +7,7 @@ import {
 import { Transaction } from '../types/transaction';
 import { Tag } from '../types/tag';
 import { Category } from '../types/category';
+import { TransactionImportPreview } from '../types/transactionImportPreview';
 
 import { fetchCategorys } from '../services/categoryService';
 
@@ -39,6 +40,7 @@ export const useImportTable = () => {
   const [confirmDeleteOpen, setConfirmDeleteOpen] = useState(false);
 
   const [categories, setCategories] = useState<Category[]>([]);
+  const [newImportedCategories, setNewImportedCategories] = useState<Category[]>([]);
 
   /* Use Effects */
 
@@ -81,10 +83,12 @@ export const useImportTable = () => {
     formData.append('file', file);
 
     try {
-      const res = await importCSVPreview(formData);
-      setPreviewData(res);
+      const res : TransactionImportPreview = await importCSVPreview(formData);
+      console.log(res);
+      setPreviewData(res.rows);
+      setNewImportedCategories(res.importedCategories);
 
-      const importedTransactions: Transaction[] = res.map((imported: PreviewTransaction, idx: number) => ({
+      const importedTransactions: Transaction[] = res.rows.map((imported: PreviewTransaction, idx: number) => ({
         id: idx + 1,
         amount: imported.amount,
         date: imported.date,
@@ -259,6 +263,15 @@ const handleSaveNew = async (saved: Transaction) => {
     }
   };   
 
+  /* Category creation */
+
+  const handleCreateCategory = (trimmedName: string) => {
+    const newCat: Category = { name: trimmedName, id: 999 + newImportedCategories.length };
+    setNewImportedCategories(prev => [...prev, newCat]);
+
+    return newCat;
+  }
+
   return {
     state: {
       file,
@@ -273,6 +286,7 @@ const handleSaveNew = async (saved: Transaction) => {
       currentlyEditingId,
       selectedIds,
       search,
+      newImportedCategories,
     },
     sortedTransactions,
     handlers: {
@@ -293,6 +307,7 @@ const handleSaveNew = async (saved: Transaction) => {
       handleAddTagsToSelected,
       handleRemoveTagsFromSelected,
       handleMassSetCategory,
+      handleCreateCategory,
     }
   };
 };

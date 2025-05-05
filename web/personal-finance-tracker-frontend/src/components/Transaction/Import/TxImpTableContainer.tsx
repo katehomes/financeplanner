@@ -19,6 +19,7 @@ const TransactionImportContainer: React.FC = () => {
       currentlyEditingId,
       selectedIds,
       search,
+      newImportedCategories
     },
     sortedTransactions,
     handlers: {
@@ -39,6 +40,7 @@ const TransactionImportContainer: React.FC = () => {
       handleAddTagsToSelected,
       handleRemoveTagsFromSelected,
       handleMassSetCategory,
+      handleCreateCategory,
     }
   } = useImportTable();
 
@@ -74,9 +76,13 @@ const TransactionImportContainer: React.FC = () => {
 
       {transactionsToImport.length > 0 && (
         <div>
+          <div>
+            <>New Categories ({newImportedCategories.length}): [{newImportedCategories.map(cg => cg.name).join(", ")}]</>
+          </div>
           <div className="table-container">
             <TxImpTableControls
               resultSize={sortedTransactions.length}
+              totalResultSize={transactionsToImport.length}
               search={search}
               setSearch={setSearch}
               selectedIds={selectedIds}
@@ -93,6 +99,7 @@ const TransactionImportContainer: React.FC = () => {
               handleEdit={handleEdit}
               handleCancelEdit={handleCancelEdit}
               handleSaveEdit={handleSaveEdit}
+              handleCreateCategory={handleCreateCategory}
             />
           </div>
         </div>

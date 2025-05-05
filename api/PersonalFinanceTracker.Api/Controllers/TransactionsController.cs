@@ -166,12 +166,16 @@ namespace PersonalFinanceTracker.Api.Controllers
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteTransaction(int id)
         {
-            var transaction = await _context.Transactions.FindAsync(id);
-            if (transaction == null)
-            {
-                return NotFound();
-            }
+            var transaction = await _context.Transactions
+                .Include(t => t.TransactionTags)
+                .FirstOrDefaultAsync(t => t.Id == id);
 
+            if (transaction == null)
+                return NotFound();
+
+            _context.TransactionTags.RemoveRange(transaction.TransactionTags); // Remove associations
+
+            transaction.TransactionTags.Clear();
             _context.Transactions.Remove(transaction);
             await _context.SaveChangesAsync();
 
@@ -345,7 +349,7 @@ namespace PersonalFinanceTracker.Api.Controllers
 
 
         [HttpPost("import/preview")] //(CSV → JSON)
-        public async Task<ActionResult<List<TransactionImportRow>>> PreviewImport([FromForm] IFormFile file)
+        public async Task<ActionResult<TransactionImportPreviewResult>> PreviewImport([FromForm] IFormFile file)
         {
             if (file == null || file.Length == 0)
                 return BadRequest("File is required.");
@@ -361,15 +365,35 @@ namespace PersonalFinanceTracker.Api.Controllers
 
             csv.Context.RegisterClassMap<TransactionImportRowMap>();
 
+            TransactionImportPreviewResult result = new TransactionImportPreviewResult();
+
             try
             {
-                var rows = csv.GetRecords<TransactionImportRow>().ToList();
-                return Ok(rows);
+                List<TransactionImportRow> rows = csv.GetRecords<TransactionImportRow>().ToList();
+                result.rows = rows;
+
+                var categories = await _context.Categories.ToListAsync();
+
+                List<Category> newCategories = new List<Category>();
+
+                foreach (var row in rows)
+                {
+                    var categoryExists = categories.Any(c => c.Name.Trim() == row.CategoryName.Trim());
+                    if (!categoryExists)
+                        newCategories.Add(new Category() { Name = row.CategoryName});
+                }
+
+                result.importedCategories = newCategories;
+                    
+                
+                
             }
             catch (Exception ex)
             {
                 return BadRequest($"Error parsing CSV: {ex.Message}");
             }
+
+            return Ok(result);
         }
 
         [HttpPost("import/confirm")] //(JSON → DB)
@@ -380,6 +404,7 @@ namespace PersonalFinanceTracker.Api.Controllers
 
             foreach (var tx in transactions)
             {
+                tx.Id = 0;
                 tx.Date = tx.Date.ToUniversalTime();
 
                 // --- CATEGORY ---

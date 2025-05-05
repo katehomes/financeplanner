@@ -4,6 +4,7 @@ import CategorySelector from '../../Category/CategorySelector';
 import TagSelector from '../../Tag/TagSelector';
 import {formatDateForInput, formatCurrency, parseCurrency} from "../../../services/helperClass";
 import {isValidTransaction } from '../../../services/transactionService';
+import { Category } from '../../../types/category';
 
 
 type Props = {
@@ -11,9 +12,13 @@ type Props = {
     transaction: Transaction;
     onSave: (transaction: Transaction) => void;
     onCancel: () => void;
+    onCreateCategory?: (name: string) => Category;
 };
 
-const TxTableEditRow: React.FC<Props> = ({ index, transaction, onSave, onCancel }) => {
+const TxTableEditRow: React.FC<Props> = ({ 
+    index, transaction, onSave, onCancel, 
+    onCreateCategory = null
+}) => {
     const txId: number | undefined = transaction.id;
     const [rawEditAmount, setRawEditAmount] = useState<string | null>(null);
     const [editTransaction, setEditTransaction] = useState<Transaction>(transaction);
@@ -73,11 +78,14 @@ const TxTableEditRow: React.FC<Props> = ({ index, transaction, onSave, onCancel 
                 <CategorySelector
                     value={editTransaction?.categoryId ?? null}
                     onChange={(id) =>
-                    setEditTransaction(prev => {
-                        if (!prev) return prev;
-                        return { ...prev, categoryId: id };
-                    })
+                        setEditTransaction(prev => {
+                            if (!prev) return prev;
+                            return { ...prev, categoryId: id };
+                        })
                     }
+                    { ...onCreateCategory != null && (
+                    <>onCreateCategory= {onCreateCategory}</>
+                    )}
                 />
             </td>
             <td>

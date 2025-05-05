@@ -3,6 +3,7 @@ import { Transaction } from '../../../types/transaction';
 import TagChipList from '../../Tag/TagChipList';
 import TxTableRow from '../Table/TxTableRow';
 import TxTableEditRow from '../Table/TxTableEditRow';
+import { Category } from '../../../types/category';
 
 interface Props {
   transactions: Transaction[];
@@ -12,12 +13,13 @@ interface Props {
   handleEdit: (tx: Transaction) => void;
     handleCancelEdit: () => void;
     handleSaveEdit: (tx: Transaction) => void;
+    handleCreateCategory?: (name: string) => Category;
 }
 
 const TxImpTable: React.FC<Props> = ({ 
-    transactions, selectedIds, setSelectedIds,
-    handleEdit, handleCancelEdit, handleSaveEdit, 
-    currentlyEditingId}) => {
+    transactions, selectedIds, setSelectedIds, currentlyEditingId,
+    handleEdit, handleCancelEdit, handleSaveEdit, handleCreateCategory
+}) => {
   return (
     <table className="import-table">
       <thead className="import-header-sticky">
@@ -54,6 +56,7 @@ const TxImpTable: React.FC<Props> = ({
                         transaction={tx}
                         onSave={handleSaveEdit}
                         onCancel={handleCancelEdit}
+                        onCreateCategory={handleCreateCategory}
                     />
                 );
             } else { 

@@ -5,6 +5,7 @@ import { Tag } from '../../../types/tag';
 
 type Props = {
     resultSize: number | 0;
+    totalResultSize: number | 0;
     search: string;
     setSearch: (value: string) => void;
     selectedIds: Set<number>;
@@ -16,6 +17,7 @@ type Props = {
 
 const TxImpTableControls: React.FC<Props> = ({
     resultSize,
+    totalResultSize,
     search,
     setSearch,
     selectedIds,
@@ -26,9 +28,8 @@ const TxImpTableControls: React.FC<Props> = ({
   }) => {
     return (
       <div className="table-controls">
-        <SearchBar value={search} onChange={setSearch} 
-        resultSize={resultSize} placeholder="Search transactions..." />
-        <p>{Array.from(selectedIds).toString()}</p>
+        <SearchBar value={search} onChange={setSearch} placeholder="Search transactions..."
+        showingResultSize={resultSize} showTotal={true} totalResultSize={totalResultSize}/>
         {selectedIds.size > 0 && (
             <BatchActionBar
             selectedIds={selectedIds}

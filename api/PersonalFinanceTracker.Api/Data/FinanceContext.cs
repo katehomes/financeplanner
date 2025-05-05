@@ -15,8 +15,8 @@ namespace PersonalFinanceTracker.Api.Data
             modelBuilder.Model.SetAnnotation("Relational:HistoryTableSchema", "public");
             modelBuilder.Model.SetAnnotation("Relational:HistoryTableName", "__EFMigrationsHistory");
 
-            modelBuilder.Entity<Transaction>()
-                .HasMany(t => t.Tags);
+            // modelBuilder.Entity<Transaction>()
+            //     .HasMany(t => t.Tags);
 
             modelBuilder.Entity<TransactionTag>()
                 .HasKey(tt => new { tt.TransactionId, tt.TagId });

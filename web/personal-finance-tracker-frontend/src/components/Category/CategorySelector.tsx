@@ -7,9 +7,13 @@ type Props = {
   value: number | null;
   onChange: (id: number | null) => void;
   disabled?: boolean;
+  onCreateCategory?: (name: string) => Promise<Category>;
 };
 
-const CategorySelector: React.FC<Props> = ({ value, onChange, disabled = false }) => {
+const CategorySelector: React.FC<Props> = ({ 
+  value, onChange, disabled = false,
+  onCreateCategory = (trim: string)=> createCategory(trim),
+}) => {
   const [categories, setCategories] = useState<Category[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -34,7 +38,7 @@ const CategorySelector: React.FC<Props> = ({ value, onChange, disabled = false }
 
   const handleCreate = async (inputValue: string) => {
       try {
-        const newCategory = await createCategory(inputValue.trim());
+        const newCategory = await onCreateCategory(inputValue.trim());
         setCategories(prev => [...prev, newCategory]);
         onChange(newCategory.id!);
       } catch (err) {
