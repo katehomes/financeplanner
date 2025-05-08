@@ -380,8 +380,6 @@ namespace PersonalFinanceTracker.Api.Controllers
                 for (int i = 0; i < rows.Count; i++)
                 {
                     var row = rows[i];
-                    var existingCat = categories.FirstOrDefault(
-                        c => c.Name.ToLower() == row.CategoryName.ToLower());
 
                     var tx = new Transaction() {
                         Id = i + 1,
@@ -389,6 +387,9 @@ namespace PersonalFinanceTracker.Api.Controllers
                         Date = row.Date,
                         Description = row.Description,
                     };
+
+                    var existingCat = categories.FirstOrDefault(
+                        c => c.Name.ToLower() == row.CategoryName.ToLower());
 
                     if (existingCat != null){
                         tx.Category = existingCat;
@@ -451,7 +452,6 @@ namespace PersonalFinanceTracker.Api.Controllers
                     }
                 }
 
-                // Reset navigation property
                 tx.Category = null;
 
                 // --- TAGS ---
@@ -478,7 +478,7 @@ namespace PersonalFinanceTracker.Api.Controllers
                             Text = tag.Text ?? "white"
                         };
                         _context.Tags.Add(resolvedTag);
-                        await _context.SaveChangesAsync(); // Save to get ID
+                        await _context.SaveChangesAsync();
                     }
 
                     tx.TransactionTags.Add(new TransactionTag
