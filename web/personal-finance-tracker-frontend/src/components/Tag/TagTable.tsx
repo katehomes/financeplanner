@@ -6,6 +6,7 @@ import { fetchTags,
   deleteTag } from '../../services/tagService';
 import TagChip from "../Tag/TagChip"
 import '../../css/tagtable.css'
+import ConfirmDeleteModal from '../ConfirmDeleteModal';
 
 const TagTable: React.FC = () => {
   const [tags, setTags] = useState<Tag[]>([]);
@@ -13,11 +14,13 @@ const TagTable: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const [isAdding, setIsAdding] = useState(false);
   const [newTag, setNewTag] = useState<Tag>({
-    name: ""
+    name: "",
+    id: -1,
   });
   const [currentlyEditingId, setCurrentlyEditingId] = useState<number | null>(null);
   const [editTag, setEditTag] = useState<Tag | null>(null);
   const [selectedIds, setSelectedIds] = useState<Set<number>>(new Set());
+
   const [confirmDeleteOpen, setConfirmDeleteOpen] = useState(false);
 
 
@@ -37,23 +40,26 @@ const TagTable: React.FC = () => {
     loadTags();
   }, []);
 
-  useEffect(() => {
-    if (confirmDeleteOpen) {
-      const proceed = window.confirm(
-        `Are you sure you want to delete ${selectedIds.size} tag(s)? This action cannot be undone.`
-      );
-      if (proceed) {
-        handleConfirmDelete();
-      }
-      setConfirmDeleteOpen(false);
-    }
-  }, [confirmDeleteOpen]);
+  // useEffect(() => {
+  //   if (confirmDeleteOpen) {
+  //     // const proceed = window.confirm(
+  //     //   `Are you sure you want to delete ${selectedIds.size} tag(s)? This action cannot be undone.`
+  //     // );
+  //     // if (proceed) {
+  //     //   handleConfirmDelete();
+  //     // }
+  //     // setConfirmDeleteOpen(false);
+  //   } else {
+
+  //   }
+  // }, [confirmDeleteOpen]);
   
 
   const handleAddClick = () => {
     setIsAdding(true);
     setNewTag({
-      name: ""
+      name: "",
+      id: -1,
     });
   };
 
@@ -139,7 +145,21 @@ const TagTable: React.FC = () => {
   if (error) return <p style={{ color: 'red' }}>{error}</p>;
 
   return (
-    <div>
+        <div>
+          <ConfirmDeleteModal
+            open={confirmDeleteOpen}
+            message={`Are you sure you want to delete ${selectedIds.size} transaction(s)? This cannot be undone.`}
+            onCancel={() => setConfirmDeleteOpen(false)}
+            onConfirm={() => {
+              handleConfirmDelete();
+              setConfirmDeleteOpen(false);
+            }}
+            impactedTags={tags.filter(tag => tag.transactions!.length > 0).map(tag => ({
+              id: tag.id ? tag.id : 0,
+              name: tag.name,
+              transactionCount: tag.transactions ? tag.transactions.length : 0,
+            }))}
+          />
       <div className="table-container">
       <table className="tag-table">
           <thead className='tag-header-sticky'>

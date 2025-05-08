@@ -19,5 +19,7 @@ namespace PersonalFinanceTracker.Api.Models
         [JsonIgnore]
         public ICollection<TransactionTag> TransactionTags { get; set; } = new List<TransactionTag>();
 
+        [NotMapped]
+        public List<Transaction> Transactions { get; set; } = new();
     }
 }

@@ -140,13 +140,11 @@ namespace PersonalFinanceTracker.Api.Controllers
                 });
             }
 
-            // Clear the incoming transaction.Tags (it's not tracked by EF)
             transaction.Tags = null;
 
             _context.Transactions.Add(transaction);
             await _context.SaveChangesAsync();
 
-            // Re-fetch transaction with joined tags and category
             var created = await _context.Transactions
                 .Include(t => t.Category)
                 .Include(t => t.TransactionTags)
@@ -155,7 +153,6 @@ namespace PersonalFinanceTracker.Api.Controllers
 
             if (created != null)
             {
-                // Populate .Tags from .TransactionTags
                 created.Tags = created.TransactionTags.Select(tt => tt.Tag).ToList();
             }
 

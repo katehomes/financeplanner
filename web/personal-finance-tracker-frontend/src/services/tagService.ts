@@ -32,8 +32,8 @@ export const deleteTag = async (id: number) => {
 };
 
 
-export const createTag = async (name: string): Promise<Tag> => {
-  const res = await addTag({ name: name });
+export const createTag = async (tag: Tag): Promise<Tag> => {
+  const res = await addTag(tag);
 
   if (!res) throw new Error('Failed to create tag');
   return res;

@@ -25,9 +25,15 @@ namespace PersonalFinanceTracker.Api.Controllers
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Tag>>> GetTag()
         {
-            return await _context.Tags
+            var tags = await _context.Tags
+                .Include(t => t.TransactionTags)
+                    .ThenInclude(tt => tt.Transaction)
                 .OrderBy(t => t.Id)
                 .ToListAsync();
+
+            PopulateTransactions(tags);
+
+            return tags;
         }
 
         // GET: api/Tag/5
@@ -82,6 +88,18 @@ namespace PersonalFinanceTracker.Api.Controllers
         [HttpPost]
         public async Task<ActionResult<Tag>> PostTag(Tag tag)
         {
+            if (!string.IsNullOrWhiteSpace(tag.Name))
+            {
+                var lowerName = tag.Name.ToLower();
+                var byName = await _context.Tags
+                    .FirstOrDefaultAsync(t => t.Name.ToLower() == lowerName);
+
+                if (byName != null)
+                    return StatusCode(403, $"Tag Already Exists: [{lowerName}]");
+            }
+
+            tag.Id = 0;
+
             _context.Tags.Add(tag);
             await _context.SaveChangesAsync();
 
@@ -107,6 +125,14 @@ namespace PersonalFinanceTracker.Api.Controllers
         private bool TagExists(int id)
         {
             return _context.Tags.Any(e => e.Id == id);
+        }
+
+        private void PopulateTransactions(IEnumerable<Tag> tags)
+        {
+            foreach (var tag in tags)
+            {
+                tag.Transactions = tag.TransactionTags.Select(tt => tt.Transaction).ToList();
+            }
         }
     }
 }

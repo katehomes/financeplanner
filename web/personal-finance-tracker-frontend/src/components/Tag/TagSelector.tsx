@@ -56,7 +56,7 @@ const TagSelector: React.FC<Props> = ({
       // Use custom newTag if passed, otherwise fallback to API
       const newTag = await (onCreateTag 
         ? onCreateTag(trimmed) 
-        : defaultCreateTag(trimmed));
+        : defaultCreateTag({name: trimmed}));
       setAllTags(prev => [...prev, newTag]);
       onChange([...value, newTag]);
     } catch (err) {
